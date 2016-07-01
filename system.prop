@@ -11,6 +11,7 @@ audio.heap.size.multiplier=7
 audio.offload.video=true
 audio.offload.min.duration.secs=30
 ro.config.media_vol_steps=25
+ro.config.vc_call_vol_steps=7
 ro.vendor.audio.sdk.fluencetype=fluence
 ro.vendor.audio.sdk.ssr=false
 persist.vendor.audio.fluence.speaker=false
