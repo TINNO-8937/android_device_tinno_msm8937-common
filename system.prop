@@ -104,6 +104,7 @@ video.disable.ubwc=1
 vidc.disable.split.mode=1
 vidc.enc.narrow.searchrange=1
 vidc.debug.perf.mode=2
+vendor.vidc.enc.disable.pq=true
 
 # Netmgrd
 ro.use_data_netmgrd=true
