@@ -285,3 +285,6 @@
 #fingerprint elan
 /dev/elan_fp           0666   root       root
 #TINNO END, add by wenguangyu for fingerprint
+
+# Kmsg device
+/dev/kmsg                 0620   root       system
