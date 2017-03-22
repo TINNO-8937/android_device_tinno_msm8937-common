@@ -453,34 +453,6 @@ on property:sys.boot_completed=1
     #CPE fw_name used by sound trigger HAL
     chown media audio /sys/kernel/wcd_cpe0/fw_name
 
-on property:persist.radio.atfwd.start=false
-    stop atfwd
-
-on property:radio.atfwd.start=false
-    stop atfwd
-
-# corefile limit
-on property:persist.debug.trace=1
-    mkdir /data/core 0777 root root
-    write /proc/sys/kernel/core_pattern "/data/core/%E.%p.%e"
-
-on property:bluetooth.dun.status=running
-    start bt-dun
-
-on property:bluetooth.dun.status=stopped
-    stop bt-dun
-
-on property:bluetooth.startbtsnoop=true
-    start btsnoop
-
-on property:bluetooth.startbtsnoop=false
-    stop btsnoop
-
-on property:vold.decrypt=trigger_restart_framework
-    start config_bt_addr
-    start config_bluetooth
-    start wcnss-service
-
 on property:persist.env.fastdorm.enabled=true
     setprop persist.radio.data_no_toggle 1
 
@@ -510,31 +482,30 @@ service tftp_server /system/vendor/bin/tftp_server
    user root
     writepid /dev/cpuset/system-background/tasks
 
-service config_bt_addr /system/vendor/bin/btnvtool -O
-    class core
-    user bluetooth
-    group bluetooth radio
-    oneshot
+on property:wc_transport.start_hci=true
+    start start_hci_filter
 
-service hciattach /system/bin/sh /system/etc/init.qcom.bt.sh
+on property:wc_transport.start_hci=false
+    stop start_hci_filter
+
+service start_hci_filter /system/vendor/bin/wcnss_filter
     class late_start
     user bluetooth
     group bluetooth oem_2950
     disabled
     oneshot
 
-on property:bluetooth.hciattach=true
-    start hciattach
+on property:wc_transport.start_root=true
+    start hci_filter_root
 
-on property:bluetooth.hciattach=false
-    setprop bluetooth.status off
+on property:wc_transport.start_root=false
+    stop hci_filter_root
 
-service bt-dun /system/vendor/bin/dun-server /dev/smd7 /dev/rfcomm0
+service hci_filter_root /system/vendor/bin/wcnss_filter
     class late_start
     user bluetooth
     group bluetooth oem_2950 system
     disabled
-    oneshot
 
 service netmgrd /system/vendor/bin/netmgrd
     class main
