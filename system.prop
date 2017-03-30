@@ -115,6 +115,7 @@ mm.enable.smoothstreaming=true
 mmp.enable.3g2=true
 mm.enable.qcom_parser=983039
 media.aac_51_output_enabled=true
+persist.media.treble_omx=false
 persist.mm.sta.enable=0
 qcom.hw.aac.encoder=true
 video.disable.ubwc=1
