@@ -236,6 +236,9 @@ on boot
     chown system system /sys/class/leds/green_breath/brightness
     chown system system /sys/class/leds/blue_breath/brightness
 
+on post-fs
+    start qseecomd
+
 # msm specific files that need to be created on /data
 on post-fs-data
     #Create directories for Fingerprint
