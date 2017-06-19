@@ -137,7 +137,7 @@ service ims_rtp_daemon /system/vendor/bin/ims_rtp_daemon
    group radio net_raw diag diag inet log
    disabled
 
-service imscmservice /system/vendor/bin/imscmservice
+service vendor.imsrcsservice /system/vendor/bin/imsrcsd
    class main
    user system
    group radio diag inet log
@@ -146,7 +146,7 @@ service imscmservice /system/vendor/bin/imscmservice
 
 on property:sys.ims.DATA_DAEMON_STATUS=1
     start ims_rtp_daemon
-    start imscmservice
+    start vendor.imsrcsservice
 
 service ppd /system/vendor/bin/mm-pp-dpps
     class late_start
