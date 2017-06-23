@@ -10,6 +10,7 @@ audio.deep_buffer.media=true
 audio.heap.size.multiplier=7
 audio.offload.video=true
 audio.offload.min.duration.secs=30
+ro.config.media_vol_steps=25
 ro.vendor.audio.sdk.fluencetype=fluence
 ro.vendor.audio.sdk.ssr=false
 persist.vendor.audio.fluence.speaker=false
