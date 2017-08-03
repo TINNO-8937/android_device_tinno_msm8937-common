@@ -15,6 +15,7 @@ ro.vendor.audio.sdk.ssr=false
 persist.vendor.audio.fluence.speaker=false
 persist.vendor.audio.fluence.voicecall=true
 persist.vendor.audio.fluence.voicerec=false
+persist.vendor.bt.enable.splita2dp=false
 vendor.audio.offload.buffer.size.kb=64
 vendor.audio.offload.gapless.enabled=true
 vendor.audio.offload.multiaac.enable=true
