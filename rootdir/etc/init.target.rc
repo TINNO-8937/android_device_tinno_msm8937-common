@@ -99,6 +99,12 @@ service thermal-engine /vendor/bin/thermal-engine -c ${sys.qcom.thermalcfg:-/ven
    group root
    writepid /dev/cpuset/system-background/tasks
 
+service vendor.power_off_alarm /vendor/bin/power_off_alarm
+    class core
+    group system
+    disabled
+    oneshot
+
 on boot
     start rmt_storage
 
@@ -177,6 +183,7 @@ on charger
     start qcom-post-boot
     setprop persist.sys.usb.config mass_storage
     start hvdcp_opti
+    start vendor.power_off_alarm
 
 service adsprpcd /vendor/bin/adsprpcd
     class main
