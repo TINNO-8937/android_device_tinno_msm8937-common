@@ -167,6 +167,10 @@ PRODUCT_PACKAGES += \
     sap.conf \
     xtwifi.conf
 
+# Gatekeeper
+PRODUCT_PACKAGES += \
+    android.hardware.gatekeeper@1.0-impl
+
 # Init scripts
 PRODUCT_PACKAGES += \
     init.qcom.early_boot.sh \
