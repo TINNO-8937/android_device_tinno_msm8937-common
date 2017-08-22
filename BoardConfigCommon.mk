@@ -187,9 +187,6 @@ TARGET_RIL_VARIANT := caf
 include device/qcom/sepolicy/sepolicy.mk
 BOARD_SEPOLICY_DIRS += $(COMMON_PATH)/sepolicy
 
-# Sensors
-USE_SENSOR_MULTI_HAL := true
-
 # TWRP Support - Optional
 ifeq ($(WITH_TWRP),true)
 -include $(COMMON_PATH)/twrp.mk
