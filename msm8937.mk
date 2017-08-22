@@ -189,6 +189,11 @@ PRODUCT_COPY_FILES += \
 PRODUCT_PACKAGES += \
     libcurl
 
+# Lights
+PRODUCT_PACKAGES += \
+    android.hardware.light@2.0-impl \
+    lights.msm8937
+
 # Media
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/media_codecs.xml:system/etc/media_codecs.xml
