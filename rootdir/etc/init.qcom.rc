@@ -715,12 +715,6 @@ service fpsvcd /system/bin/fpsvcd_ca_qsee –uuid 080100000000000000000000000000
     group root system
     oneshot
 
-service fingerprintd /system/bin/fingerprintd
-    class main
-    user system
-    group system system
-    writepid /dev/cpuset/system-background/tasks
-
 on property:persist.sys.fp.goodix=0
     stop gx_fpd
 
