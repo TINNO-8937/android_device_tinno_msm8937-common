@@ -145,7 +145,7 @@ PRODUCT_PACKAGES += \
     FMRadio \
     libfmjni
 
-# For android_filesystem_config.h
+# For config.fs
 PRODUCT_PACKAGES += \
     fs_config_files
 
