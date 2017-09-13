@@ -20,6 +20,7 @@ persist.vendor.bt.enable.splita2dp=false \
 ro.config.media_vol_steps=25 \
 ro.config.vc_call_vol_steps=7 \
 ro.vendor.audio.sdk.fluencetype=fluence \
+ro.af.client_heap_size_kbyte=7168 \
 ro.vendor.audio.sdk.ssr=false \
 vendor.audio.flac.sw.decoder.24bit=true \
 vendor.audio.hw.aac.encoder=true \
