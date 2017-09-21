@@ -79,6 +79,8 @@ persist.hwc.enable_vds=1
 persist.hwc.mdpcomp.enable=true
 persist.demo.hdmirotationlock=false
 ro.sf.lcd_density=480
+sdm.debug.disable_skip_validate=1
+
 
 # Enable Delay Service Restart
 ro.am.reschedule_service=true
