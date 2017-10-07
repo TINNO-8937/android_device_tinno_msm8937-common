@@ -39,7 +39,7 @@ setup_vendor "$DEVICE_COMMON" "$VENDOR_COMMON" "$LINEAGE_ROOT" true
 write_headers "garlic wimlite hs2 hs3"
 
 # The standard common blobs
-write_makefiles "$MY_DIR"/proprietary-files.txt
+write_makefiles "$MY_DIR"/proprietary-files.txt true
 
 # TWRP
 cat << EOF >> "$BOARDMK"
@@ -60,7 +60,7 @@ if [ -s "$MY_DIR"/../../$VENDOR_DEVICE/$DEVICE/proprietary-files.txt ]; then
     write_headers
 
     # The standard device blobs
-    write_makefiles "$MY_DIR"/../../$VENDOR_DEVICE/$DEVICE/proprietary-files.txt
+    write_makefiles "$MY_DIR"/../../$VENDOR_DEVICE/$DEVICE/proprietary-files.txt true
 
     # We are done!
     write_footers
