@@ -195,11 +195,6 @@ PRODUCT_PACKAGES += \
     init.qcom.usb.sh \
     ueventd.qcom.rc
 
-# IPA Manager
-PRODUCT_PACKAGES += \
-    ipacm \
-    IPACM_cfg.xml
-
 # IRSC
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/sec_config:system/etc/sec_config
