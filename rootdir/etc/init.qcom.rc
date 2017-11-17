@@ -382,9 +382,9 @@ on post-fs-data
     # qti-logkit data
     mkdir /data/misc/qti-logkit/ 0771 system system
     mkdir /data/misc/qti-logkit/shared-privileged/ 2770 system system
-    mkdir /data/misc/qti-logkit/shared-public/ 2770 system qcom_diag
+    mkdir /data/misc/qti-logkit/shared-public/ 2770 system oem_2950
     mkdir /data/misc/qti-logkit/socket-privileged/ 2770 system system
-    mkdir /data/misc/qti-logkit/socket-public/ 2750 system qcom_diag
+    mkdir /data/misc/qti-logkit/socket-public/ 2750 system oem_2950
     mkdir /data/misc/qti-logkit/logdata/ 2750 system shell
 
     #Create SWAP related dirs
@@ -519,7 +519,7 @@ service config_bt_addr /system/bin/btnvtool -O
 service hciattach /system/bin/sh /system/etc/init.qcom.bt.sh
     class late_start
     user bluetooth
-    group bluetooth net_bt_admin
+    group bluetooth oem_2950
     disabled
     oneshot
 
@@ -532,7 +532,7 @@ on property:bluetooth.hciattach=false
 service bt-dun /system/bin/dun-server /dev/smd7 /dev/rfcomm0
     class late_start
     user bluetooth
-    group bluetooth net_bt_admin inet
+    group bluetooth oem_2950 system
     disabled
     oneshot
 
@@ -544,7 +544,7 @@ service ipacm-diag /system/bin/ipacm-diag
     class main
     user system
     socket ipacm_log_file dgram 660 system net_admin
-    group net_admin qcom_diag
+    group net_admin oem_2950
 
 service ipacm /system/bin/ipacm
     class main
@@ -555,7 +555,7 @@ service ipacm /system/bin/ipacm
 service qti /system/vendor/bin/qti
     class main
     user radio
-    group radio net_raw qcom_diag usb net_admin
+    group radio oem_2950 usb
     writepid /dev/cpuset/system-background/tasks
 
 service sensors /system/bin/sensors.qcom
@@ -603,7 +603,7 @@ on property:sys.shutdown.requested=*
 service loc_launcher /system/bin/loc_launcher
     #loc_launcher will start as root and set its uid to gps
     class late_start
-    group gps inet qcom_diag wifi
+    group gps inet oem_2950 wifi
     writepid /dev/cpuset/system-background/tasks
 
 service qcom-sh /system/bin/sh /init.qcom.sh
@@ -675,7 +675,7 @@ on charger
 service time_daemon /system/bin/time_daemon
     class main
     user root
-    group root
+    group root oem_2950
     writepid /dev/cpuset/system-background/tasks
 
 service gx_fpd /system/bin/gx_fpd
