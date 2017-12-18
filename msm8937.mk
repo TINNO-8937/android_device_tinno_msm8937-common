@@ -102,7 +102,7 @@ PRODUCT_PACKAGES += \
 # Audio configuration
 PRODUCT_COPY_FILES += \
     hardware/qcom/audio-caf/msm8996/configs/msm8937/aanc_tuning_mixer.txt:system/vendor/etc/aanc_tuning_mixer.txt \
-    hardware/qcom/audio-caf/msm8996/configs/msm8937/audio_effects.conf:system/vendor/vendor/etc/audio_effects.conf \
+    hardware/qcom/audio-caf/msm8996/configs/msm8937/audio_effects.xml:system/vendor/vendor/etc/audio_effects.xml \
     hardware/qcom/audio-caf/msm8996/configs/msm8937/audio_output_policy.conf:system/vendor/vendor/etc/audio_output_policy.conf \
     hardware/qcom/audio-caf/msm8996/configs/msm8937/audio_platform_info_extcodec.xml:system/vendor/etc/audio_platform_info_extcodec.xml \
     $(LOCAL_PATH)/audio/audio_policy.conf:system/vendor/etc/audio_policy.conf \
