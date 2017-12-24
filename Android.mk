@@ -68,7 +68,7 @@ $(WCNSS_CONFIG_SYMLINK): $(LOCAL_INSTALLED_MODULE)
 	@echo "WCNSS config link: $@"
 	@mkdir -p $(dir $@)
 	@rm -rf $@
-	$(hide) ln -sf /data/misc/wifi/$(notdir $@) $@
+	$(hide) ln -sf /vendor/etc/wifi/$(notdir $@) $@
 
 ALL_DEFAULT_INSTALLED_MODULES += $(WCNSS_CONFIG_SYMLINK)
 
