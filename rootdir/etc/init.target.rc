@@ -90,11 +90,6 @@ service thermal-engine /system/vendor/bin/thermal-engine
    group root
    writepid /dev/cpuset/system-background/tasks
 
-service audiod /system/vendor/bin/audiod
-   class late_start
-   user system
-   group system
-
 on boot
     start rmt_storage
 
