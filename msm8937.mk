@@ -194,6 +194,10 @@ PRODUCT_PACKAGES += \
     android.hidl.base@1.0 \
     android.hidl.manager@1.0
 
+# IMS
+PRODUCT_PACKAGES += \
+    ims-ext-common
+
 # Init scripts
 PRODUCT_PACKAGES += \
     init.qcom.early_boot.sh \
