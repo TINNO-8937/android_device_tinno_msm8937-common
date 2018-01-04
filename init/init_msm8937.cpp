@@ -25,24 +25,53 @@
    IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <cstdio>
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <unistd.h>
-#include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 #include <android-base/file.h>
+#include <android-base/logging.h>
 #include <android-base/properties.h>
 #include <android-base/strings.h>
 
-#include "property_service.h"
-#include "vendor_init.h"
+#define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
+#include <sys/_system_properties.h>
 
+#include "vendor_init.h"
+#include "property_service.h"
+
+#define FP_DEV_FLE "/sys/devices/platform/fp_drv/fp_drv_info"
+
+using android::base::Trim;
 using android::base::GetProperty;
 using android::base::ReadFileToString;
-using android::base::Trim;
 using android::init::property_set;
+
+void init_fingerprint_properties()
+{
+    std::string fp_dev;
+
+    if (ReadFileToString(FP_DEV_FLE, &fp_dev)) {
+        LOG(INFO) << "Loading Fingerprint HAL for sensor version " << fp_dev;
+        if (!strncmp(fp_dev.c_str(), "silead_fp", 9)) {
+            property_set("ro.hardware.fingerprint", "silead");
+        } else if (!strncmp(fp_dev.c_str(), "goodix_fp", 9)) {
+            property_set("ro.hardware.fingerprint", "goodix");
+        } else if (!strncmp(fp_dev.c_str(), "elan_fp", 7)) {
+            property_set("ro.hardware.fingerprint", "elan");
+        } else if (!strncmp(fp_dev.c_str(), "chipone_fp", 10)) {
+            property_set("ro.hardware.fingerprint", "chipone");
+        } else {
+            LOG(ERROR) << "Unsupported fingerprint sensor: " << fp_dev;
+        }
+    }
+    else {
+        LOG(ERROR) << "Failed to detect sensor version";
+    }
+}
 
 static void init_alarm_boot_properties()
 {
@@ -81,4 +110,5 @@ static void init_alarm_boot_properties()
 void vendor_load_properties()
 {
     init_alarm_boot_properties();
+    init_fingerprint_properties();
 }
