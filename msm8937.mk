@@ -147,7 +147,10 @@ PRODUCT_PACKAGES += \
     hwcomposer.msm8937 \
     memtrack.msm8937 \
     libdisplayconfig \
-    liboverlay
+    liboverlay \
+    libqdMetaData.system \
+    vendor.display.config@1.0 \
+    vendor.display.config@1.0_vendor
 
 # Data
 PRODUCT_COPY_FILES += \
