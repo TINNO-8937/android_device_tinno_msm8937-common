@@ -86,7 +86,7 @@ on early-boot
     write /sys/kernel/boot_adsp/boot 1
     write /sys/kernel/boot_slpi/boot 1
     chown root audio /sys/kernel/boot_adsp/boot
-    exec u:r:qti_init_shell:s0 -- /init.qcom.early_boot.sh
+    exec u:r:qti_init_shell:s0 -- ./init.qcom.early_boot.sh
 
     # Graphics
     chown system graphics /sys/class/graphics/fb0/idle_time
@@ -594,12 +594,12 @@ service loc_launcher /system/vendor/bin/loc_launcher
     group gps inet diag wifi
     writepid /dev/cpuset/system-background/tasks
 
-service qcom-sh init.qcom.sh
+service qcom-sh /system/vendor/bin/init.qcom.sh
     class late_start
     user root
     oneshot
 
-service qcom-post-boot /system/etc/init.qcom.post_boot.sh
+service qcom-post-boot /system/vendor/bin/init.qcom.post_boot.sh
     class late_start
     user root
     disabled

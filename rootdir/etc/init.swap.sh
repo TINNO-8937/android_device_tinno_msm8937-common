@@ -1,4 +1,4 @@
-#!/system/bin/sh
+#!/system/vendor/bin/sh
 
 # Static swiftness
 echo 1 > /proc/sys/vm/swap_ratio_enable
