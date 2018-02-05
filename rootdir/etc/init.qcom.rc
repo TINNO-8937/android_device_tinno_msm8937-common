@@ -268,9 +268,6 @@ on post-fs-data
     mkdir /data/misc/stargate/calib_test 0770 system system
     mkdir /data/misc/stargate/database 0770 system system
 
-    # Create directory for TZ Apps
-    mkdir /data/misc/qsee 0770 system system
-
     # Create directory for tftp
     mkdir /data/vendor/tombstones 0771 system system
 
@@ -303,22 +300,12 @@ on post-fs-data
     mkdir /data/connectivity 0771 system system
     chown system system /data/connectivity
 
-    # Create the directories used by DPM subsystem
-    mkdir /data/dpm 0771 system system
-    chown system system /data/dpm
-
-    mkdir /data/dpm/nsrm 0771 system system
-    chown system system /data/dpm/nsrm
-
     # Create directory used by audio subsystem
     mkdir /data/vendor/misc/audio 0770 audio audio
 
     # Create directory for audio delta files
     mkdir /data/vendor/misc/audio/acdbdata 0770 media audio
     mkdir /data/vendor/misc/audio/acdbdata/delta 0770 media audio
-
-    # Create directory used by the DASH client
-    mkdir /data/misc/dash 0770 media audio
 
     # Create directory for radio
     mkdir /data/vendor/radio 0770 system radio
@@ -345,14 +332,6 @@ on post-fs-data
     mkdir /data/vendor/location/quipc 0770 gps system
     mkdir /data/vendor/location/gsiff 0770 gps gps
 
-    #Create directory from IMS services
-    mkdir /data/shared 0755
-    chown system system /data/shared
-
-    #Create directory for FOTA
-    mkdir /data/fota 0771
-    chown system system /data/fota
-
     # Sensors
     mkdir /persist/sensors
     chown root system /persist/sensors
@@ -364,9 +343,6 @@ on post-fs-data
     # allow the sensors daemon to perform this as non-root
     chown root system /dev/sensors
     chmod 0660 /dev/sensors
-
-    mkdir /data/misc/sensors
-    chmod 0775 /data/misc/sensors
 
     # Create /data/time folder for time-services
     mkdir /data/time/ 0700 system system
@@ -422,10 +398,6 @@ on post-fs-data
     mkdir /data/misc/qti-logkit/socket-privileged/ 2770 system system
     mkdir /data/misc/qti-logkit/socket-public/ 2750 system oem_2950
     mkdir /data/misc/qti-logkit/logdata/ 2750 system shell
-
-    #Create SWAP related dirs
-    mkdir /data/system/swap 0770 root system
-    chmod 2770 /data/system/swap
 
     # set aggressive read ahead for dm-0 and dm-1 during boot up
     write /sys/block/dm-0/queue/read_ahead_kb 2048
