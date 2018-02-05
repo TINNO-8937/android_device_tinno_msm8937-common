@@ -653,7 +653,7 @@ on charger
 service time_daemon /system/vendor/bin/time_daemon
     class main
     user root
-    group root oem_2950
+    group root
     writepid /dev/cpuset/system-background/tasks
 
 service gx_fpd /system/vendor/bin/gx_fpd
