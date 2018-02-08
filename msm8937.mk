@@ -105,6 +105,7 @@ PRODUCT_PACKAGES += \
     libqcompostprocbundle \
     libqcomvisualizer \
     libqcomvoiceprocessing \
+    libvolumelistener \
     tinymix
 
 # Audio configuration
