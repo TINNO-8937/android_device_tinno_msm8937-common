@@ -156,9 +156,7 @@ PRODUCT_PACKAGES += \
     memtrack.msm8937 \
     libdisplayconfig \
     liboverlay \
-    libqdMetaData.system \
-    vendor.display.config@1.0 \
-    vendor.display.config@1.0_vendor
+    libqdMetaData.system
 
 # Data
 PRODUCT_COPY_FILES += \
