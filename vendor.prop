@@ -130,6 +130,9 @@ ro.vendor.qti.sys.fw.bg_apps_limit=60
 ro.vendor.at_library=libqti-at.so
 ro.vendor.gt_library=libqti-gt.so
 
+# Priv-app permissions whitelist
+ro.control_privapp_permissions=enforce
+
 # Misc
 ro.emmc_size=16GB
 
