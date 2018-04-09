@@ -111,9 +111,6 @@ BOARD_CHARGER_ENABLE_SUSPEND := true
 BOARD_USES_CYANOGEN_HARDWARE := true
 BOARD_HARDWARE_CLASS += hardware/cyanogen/cmhw
 
-# CNE
-BOARD_USES_QCNE := true
-
 # Dex
 ifeq ($(HOST_OS),linux)
   ifneq ($(TARGET_BUILD_VARIANT),eng)
