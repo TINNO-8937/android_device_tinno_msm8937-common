@@ -253,6 +253,11 @@ on boot
     # Create vpp directory
     mkdir /persist/vpp 0770 media media
 
+    service loggy /vendor/bin/loggy.sh
+       class core
+       user root
+       oneshot
+
 # msm specific files that need to be created on /data
 on post-fs-data
     mkdir /data/vendor/misc 01771 system system
