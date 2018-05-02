@@ -583,6 +583,7 @@ etc/permissions/telephonyservice.xml
 -framework/qti-telephony-common.jar
 -framework/tcmclient.jar
 -priv-app/qcrilmsgtunnel/qcrilmsgtunnel.apk
+vendor/bin/ATFWD-daemon
 vendor/bin/netmgrd
 vendor/bin/qti
 vendor/bin/rmt_storage
