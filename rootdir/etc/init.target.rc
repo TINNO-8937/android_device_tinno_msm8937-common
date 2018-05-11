@@ -38,11 +38,13 @@ on fs
     symlink /dev/block/platform/soc/${ro.boot.bootdevice} /dev/block/bootdevice
     write /proc/sys/vm/swappiness 100
 
-    mkdir /persist/data 0700 system system
-    mkdir /persist/bms 0700 root system
-
     mount_all /vendor/etc/fstab.qcom
-    restorecon_recursive /persist
+
+    # Set permissions for persist partition
+    chown root system /mnt/vendor/persist
+    chmod 0771 /mnt/vendor/persist
+    mkdir /mnt/vendor/persist/data 0700 system system
+    restorecon_recursive /mnt/vendor/persist
 
 on post-fs-data
     mkdir /data/tombstones 0771 system system
