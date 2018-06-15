@@ -268,6 +268,8 @@
 509:4294967295:1000:1006:1013:1021:1047
 510:4294967295:1000:1006:1013:1021:1047
 511:4294967295:1000:1006:1013:1021:1047
+/* Allow cnd to accquire netbind */
+18:4294967295:1000:3003
 /* Allow RCS service to aquire net_raw permission */
 18:4294967295:1001:3004
 /* Allow QMID service to aquire net_raw permission */
