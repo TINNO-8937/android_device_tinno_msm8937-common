@@ -187,6 +187,9 @@ TARGET_RIL_VARIANT := caf
 # SELinux
 include device/qcom/sepolicy/sepolicy.mk
 
+# Telephony Jar
+TARGET_PROVIDES_QTI_TELEPHONY_JAR := true
+
 # Treble
 TARGET_COPY_OUT_VENDOR := system/vendor
 
