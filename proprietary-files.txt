@@ -576,12 +576,12 @@ etc/permissions/qcrilhook.xml
 etc/permissions/radioconfig.xml
 etc/permissions/radioconfiginterface.xml
 etc/permissions/telephonyservice.xml
--framework/embmslibrary.jar
--framework/QtiTelephonyServicelibrary.jar
--framework/qcnvitems.jar
--framework/qcrilhook.jar
--framework/qti-telephony-common.jar
--framework/tcmclient.jar
+framework/embmslibrary.jar
+framework/QtiTelephonyServicelibrary.jar
+framework/qcnvitems.jar
+framework/qcrilhook.jar
+framework/qti-telephony-common.jar
+framework/tcmclient.jar
 -priv-app/qcrilmsgtunnel/qcrilmsgtunnel.apk
 vendor/bin/ATFWD-daemon
 vendor/bin/netmgrd
@@ -654,8 +654,8 @@ vendor/lib64/vendor.qti.imsrtpservice@1.0_vendor.so
 
 # Sensors
 vendor/bin/sensors.qcom
--vendor/framework/vendor.qti.hardware.alarm-V1.0-java.jar
--vendor/framework/vendor.qti.hardware.sensorscalibrate-V1.0-java.jar
+vendor/framework/vendor.qti.hardware.alarm-V1.0-java.jar
+vendor/framework/vendor.qti.hardware.sensorscalibrate-V1.0-java.jar
 vendor/lib/hw/activity_recognition.msm8937.so
 vendor/lib/libsensor1.so
 vendor/lib/libsensor_reg.so
