@@ -115,6 +115,20 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     fs_config_files
 
+# GPS
+PRODUCT_PACKAGES += \
+    gps.msm8937 \
+    libcurl \
+    libgnsspps
+
+PRODUCT_PACKAGES += \
+    flp.conf \
+    gps.conf \
+    izat.conf \
+    lowi.conf \
+    sap.conf \
+    xtwifi.conf
+
 # Init scripts
 PRODUCT_PACKAGES += \
     fstab.qcom \
