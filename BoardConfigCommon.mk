@@ -210,6 +210,11 @@ TARGET_RIL_VARIANT := caf
 # Sensors
 USE_SENSOR_MULTI_HAL := true
 
+# TWRP Support - Optional
+ifeq ($(WITH_TWRP),true)
+-include $(COMMON_PATH)/twrp.mk
+endif
+
 # Vendor init
 TARGET_INIT_VENDOR_LIB := libinit_msm8937
 TARGET_PLATFORM_DEVICE_BASE := /devices/soc/
