@@ -56,11 +56,11 @@ setup_vendor "$DEVICE_COMMON" "$VENDOR_COMMON" "$CM_ROOT" true "$CLEAN_VENDOR"
 
 extract "$MY_DIR"/proprietary-files.txt "$SRC" "$SECTION"
 
-if [ -s "$MY_DIR"/../../$VENDOR/$DEVICE/proprietary-files.txt ]; then
+if [ -s "$MY_DIR"/../../$VENDOR_DEVICE/$DEVICE/proprietary-files.txt ]; then
     # Reinitialize the helper for device
-    setup_vendor "$DEVICE" "$VENDOR" "$CM_ROOT" false "$CLEAN_VENDOR"
+    setup_vendor "$DEVICE" "$VENDOR_DEVICE" "$CM_ROOT" false "$CLEAN_VENDOR"
 
-    extract "$MY_DIR"/../../$VENDOR/$DEVICE/proprietary-files.txt "$SRC" "$SECTION"
+    extract "$MY_DIR"/../../$VENDOR_DEVICE/$DEVICE/proprietary-files.txt "$SRC" "$SECTION"
 fi
 
 "$MY_DIR"/setup-makefiles.sh
