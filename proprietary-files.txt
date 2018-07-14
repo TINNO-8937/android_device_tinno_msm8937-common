@@ -604,8 +604,6 @@ bin/netmgrd
 bin/radish
 bin/rmt_storage
 bin/tftp_server
-etc/data/dsi_config.xml
-etc/data/netmgr_config.xml
 etc/permissions/embms.xml
 etc/permissions/qcrilhook.xml
 etc/permissions/qcnvitems.xml
