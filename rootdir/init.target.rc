@@ -68,6 +68,15 @@ service qseecomd /system/bin/qseecomd
     user root
     group root
 
+service swap-init /system/bin/init.swap.sh
+    class late_start
+    user root
+    disabled
+    oneshot
+
+on property:ro.config.swap=true
+    start swap-init
+
 service thermal-engine /system/vendor/bin/thermal-engine
     class main
     user root
