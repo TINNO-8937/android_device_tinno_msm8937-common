@@ -164,12 +164,6 @@ on charger
     setprop persist.sys.usb.config mass_storage
     start hvdcp_opti
 
-service hbtp /system/vendor/bin/hbtp_daemon
-    class main
-    user system
-    group system
-    disabled
-
 service adsprpcd /system/bin/adsprpcd
     class main
     user media
