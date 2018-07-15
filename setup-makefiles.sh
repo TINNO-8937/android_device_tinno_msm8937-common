@@ -41,6 +41,13 @@ write_headers "garlic wimlite hs2 hs3"
 # The standard common blobs
 write_makefiles "$MY_DIR"/proprietary-files.txt
 
+# TWRP
+cat << EOF >> "$BOARDMK"
+ifeq (\$(WITH_TWRP),true)
+TARGET_RECOVERY_DEVICE_DIRS += vendor/$VENDOR_COMMON/$DEVICE_COMMON/proprietary
+endif
+EOF
+
 # We are done!
 write_footers
 
