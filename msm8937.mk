@@ -156,7 +156,6 @@ PRODUCT_PACKAGES += \
 
 # Init scripts
 PRODUCT_PACKAGES += \
-    fstab.qcom \
     init.qcom.rc \
     init.target.rc \
     init.qcom.power.rc \
