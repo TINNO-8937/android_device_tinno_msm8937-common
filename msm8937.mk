@@ -100,7 +100,6 @@ PRODUCT_COPY_FILES += \
     hardware/qcom/audio-caf/msm8996/configs/msm8937/audio_effects.conf:system/vendor/etc/audio_effects.conf \
     hardware/qcom/audio-caf/msm8996/configs/msm8937/audio_output_policy.conf:system/vendor/etc/audio_output_policy.conf \
     hardware/qcom/audio-caf/msm8996/configs/msm8937/audio_platform_info_extcodec.xml:system/etc/audio_platform_info_extcodec.xml \
-    hardware/qcom/audio-caf/msm8996/configs/msm8937/audio_platform_info.xml:system/etc/audio_platform_info.xml \
     $(LOCAL_PATH)/audio/audio_policy.conf:system/etc/audio_policy.conf \
     hardware/qcom/audio-caf/msm8996/configs/msm8937/sound_trigger_mixer_paths.xml:system/etc/sound_trigger_mixer_paths.xml \
     hardware/qcom/audio-caf/msm8996/configs/msm8937/sound_trigger_platform_info.xml:system/etc/sound_trigger_platform_info.xml
