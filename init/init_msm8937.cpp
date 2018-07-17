@@ -41,40 +41,6 @@
 
 using android::base::Trim;
 
-#define DRV_INFO "/sys/devices/platform/fp_drv/fp_drv_info"
-
-static void fp_prop()
-{
-    int fd = open(DRV_INFO, 0);
-    if (fd <= 0) {
-        ERROR("Cannot open: %s", DRV_INFO);
-    }
-
-    char fp_drv[50];
-    memset(fp_drv, 0, sizeof(fp_drv));
-    int result = read(fd, fp_drv, sizeof(fp_drv));
-
-    if (strcmp(fp_drv, "elan_fp") == 0) {
-        property_set("persist.sys.fp.goodix", "0");
-        property_set("persist.sys.fp.silead", "0");
-        property_set("ro.hardware.fingerprint", "elan");
-    } else if (strcmp(fp_drv, "goodix_fp") == 0) {
-        property_set("persist.sys.fp.goodix", "1");
-        property_set("persist.sys.fp.silead", "0");
-        property_set("ro.hardware.fingerprint", "goodix");
-    } else if (strcmp(fp_drv, "silead_fp") == 0) {
-        property_set("persist.sys.fp.goodix", "0");
-        property_set("persist.sys.fp.silead", "1");
-        property_set("ro.hardware.fingerprint", "silead");
-    } else if (strcmp(fp_drv, "chipone_fp") == 0) {
-        property_set("persist.sys.fp.goodix", "0");
-        property_set("persist.sys.fp.silead", "0");
-        property_set("ro.hardware.fingerprint", "chipone");
-    } else {
-        ERROR("%s: Fingerprint sensor is unsupported", __func__);
-    }
-    close(fd);
-}
 static void init_alarm_boot_properties()
 {
     char const *boot_reason_file = "/proc/sys/kernel/boot_reason";
@@ -111,5 +77,4 @@ static void init_alarm_boot_properties()
 void vendor_load_properties()
 {
     init_alarm_boot_properties();
-    fp_prop();
 }

@@ -133,7 +133,8 @@ PRODUCT_COPY_FILES += \
 
 # Fingerprint
 PRODUCT_PACKAGES += \
-    fingerprintd
+    fingerprintd \
+    fingerprint.msm8937
 
 # FM
 PRODUCT_PACKAGES += \
