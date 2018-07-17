@@ -156,18 +156,16 @@ PRODUCT_PACKAGES += \
 
 # Init scripts
 PRODUCT_PACKAGES += \
-    init.qcom.rc \
+    init.qcom.early_boot.sh \
+    init.qcom.post_boot.sh \
+    init.qcom.bt.sh \
     init.target.rc \
-    init.qcom.power.rc \
+    init.qcom.rc \
+    init.qcom.sh \
     init.qcom.usb.rc \
-    init.recovery.qcom.rc \
+    init.msm.usb.configfs.rc \
+    init.qcom.usb.sh \
     ueventd.qcom.rc
-
-PRODUCT_PACKAGES += \
-    init.qcom.bt.sh
-
-PRODUCT_PACKAGES += \
-    init.qcom.sh
 
 # IPA Manager
 PRODUCT_PACKAGES += \
