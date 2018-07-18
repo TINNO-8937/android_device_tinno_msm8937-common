@@ -474,6 +474,10 @@ vendor/lib64/libimsmedia_jni.so
 vendor/lib64/librcc.so
 vendor/lib64/libvoice-svc.so
 
+# Lights
+lib/hw/lights.msm8937.so
+lib64/hw/lights.msm8937.so
+
 # Listen
 vendor/lib/hw/sound_trigger.primary.msm8937.so
 vendor/lib/libadpcmdec.so

@@ -181,10 +181,6 @@ PRODUCT_PACKAGES += \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/sec_config:system/etc/sec_config
 
-# Lights
-PRODUCT_PACKAGES += \
-    lights.msm8937
-
 # Misc
 PRODUCT_PACKAGES += \
     libcurl
