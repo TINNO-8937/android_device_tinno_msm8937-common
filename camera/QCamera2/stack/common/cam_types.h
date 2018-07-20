@@ -2233,6 +2233,8 @@ typedef enum {
     /*Spot light detection result output from af core*/
     CAM_INTF_META_SPOT_LIGHT_DETECT,
     /* HAL based HDR*/
+    TINNO1, /* HACK */
+    TINNO2, /* HACK */
     CAM_INTF_PARM_HAL_BRACKETING_HDR,
     CAM_INTF_PARM_MAX
 } cam_intf_parm_type_t;
