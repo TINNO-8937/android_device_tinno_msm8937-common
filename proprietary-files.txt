@@ -57,6 +57,7 @@ vendor/lib/soundfx/libqcvirt.so
 
 # Bluetooth
 bin/btnvtool
+bin/dun-server
 bin/wcnss_filter
 bin/hci_qcomm_init
 vendor/lib64/libbtnv.so
