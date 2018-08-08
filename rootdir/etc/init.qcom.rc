@@ -703,28 +703,26 @@ service time_daemon /system/bin/time_daemon
     group root
     writepid /dev/cpuset/system-background/tasks
 
+service gx_fpd /system/bin/gx_fpd
+    class main
+    user root
+    group root system
+    oneshot
+
+service fpsvcd /system/bin/fpsvcd_ca_qsee –uuid 08010000000000000000000000000000
+    class main
+    user root
+    group root system
+    oneshot
+
 service fingerprintd /system/bin/fingerprintd
     class main
     user system
     group system system
     writepid /dev/cpuset/system-background/tasks
 
-service gx_fpd /system/bin/gx_fpd
-    class main
-    user root
-    group root system
-    disabled
-    on property:persist.sys.fp.goodix=1	
-    start gx_fpd
-    on property:persist.sys.fp.goodix=0
+on property:persist.sys.fp.goodix=0
     stop gx_fpd
 
-service fpsvcd /system/bin/fpsvcd_ca_qsee –uuid 08010000000000000000000000000000
-    class main
-    user root
-    group root system
-    disabled
-    on property:persist.sys.fp.silead=1	
-    start fpsvcd
-    on property:persist.sys.fp.silead=0	
+on property:persist.sys.fp.silead=0
     stop fpsvcd

@@ -106,6 +106,7 @@ ro.frp.pst=/dev/block/bootdevice/by-name/config
 
 # Fingerprint
 persist.qfp=false
+persist.sys.fp.goodix=1
 
 # Media
 media.msm8956hw=0
