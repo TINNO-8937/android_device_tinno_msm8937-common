@@ -639,7 +639,6 @@ framework/embmslibrary.jar
 framework/QtiTelephonyServicelibrary.jar
 framework/qcnvitems.jar
 framework/qcrilhook.jar
-framework/qti-telephony-common.jar
 framework/tcmclient.jar
 -priv-app/qcrilmsgtunnel/qcrilmsgtunnel.apk
 vendor/bin/ATFWD-daemon
@@ -673,9 +672,10 @@ vendor/lib64/vendor.qti.hardware.radio.uim_remote_server@1.0_vendor.so
 vendor/radio/qcril_database/qcril.db
 vendor/lib/libmdmdetect.so
 
+# Radio(QTI Telephony) - from daisy - PKQ1.180917.001.V10.0.2.0.PDLMIFJ
+framework/qti-telephony-common.jar
+
 # Radio - IMS
--app/ims/ims.apk
--app/imssettings/imssettings.apk
 -app/radioconfig/radioconfig.apk
 -app/uceShimService/uceShimService.apk
 etc/permissions/qti-vzw-ims-internal.xml
@@ -710,6 +710,9 @@ vendor/lib64/lib-uceservice.so
 vendor/lib64/com.qualcomm.qti.imscmservice@1.0_vendor.so
 vendor/lib64/vendor.qti.imsrtpservice@1.0-service-Impl.so
 vendor/lib64/vendor.qti.imsrtpservice@1.0_vendor.so
+
+# Radio(ims.apk) - from daisy - PKQ1.180917.001.V10.0.2.0.PDLMIFJ
+-priv-app/ims/ims.apk
 
 # Sensors
 vendor/bin/sensors.qcom
