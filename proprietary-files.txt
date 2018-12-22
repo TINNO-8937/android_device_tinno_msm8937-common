@@ -285,26 +285,6 @@ vendor/lib64/vendor.qti.hardware.fm@1.0_vendor.so
 vendor/lib64/hw/gatekeeper.msm8937.so
 
 # GPS - from daisy - PKQ1.180917.001.V10.0.2.0.PDLMIFJ
-etc/permissions/com.qti.location.sdk.xml
-etc/permissions/com.qualcomm.location.xml
-etc/permissions/izat.xt.srv.xml
--framework/com.qti.location.sdk.jar
--framework/izat.xt.srv.jar
--priv-app/com.qualcomm.location/com.qualcomm.location.apk
-lib/vendor.qti.gnss@1.0.so
-lib/vendor.qti.gnss@1.1.so
-lib/vendor.qti.gnss@1.2.so
-lib/vendor.qti.gnss@2.0.so
-lib/vendor.qti.gnss@2.1.so
-lib/liblocationservice_jni.so
-lib/libxt_native.so
-lib64/vendor.qti.gnss@1.0.so
-lib64/vendor.qti.gnss@1.1.so
-lib64/vendor.qti.gnss@1.2.so
-lib64/vendor.qti.gnss@2.0.so
-lib64/vendor.qti.gnss@2.1.so
-lib64/liblocationservice_jni.so
-lib64/libxt_native.so
 vendor/bin/loc_launcher
 vendor/bin/lowi-server
 vendor/bin/slim_daemon
