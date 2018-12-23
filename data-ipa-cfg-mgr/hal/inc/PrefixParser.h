@@ -57,7 +57,6 @@ public:
     int size();
     bool allAreFullyQualified();
     Prefix getFirstPrefix();
-    Prefix getFirstPrefix(IP_FAM);
     string getLastErrAsStr();
 private:
     bool add(string /* in */, IP_FAM /* famHint */);

@@ -849,7 +849,9 @@ static int ipa_nl_decode_nlmsg
 
 				evt_data.event = IPA_ADDR_ADD_EVENT;
 				data_addr->if_index = msg_ptr->nl_addr_info.metainfo.ifa_index;
+#ifdef FEATURE_L2TP
 				strlcpy(data_addr->iface_name, dev_name, sizeof(data_addr->iface_name));
+#endif
 				if(AF_INET6 == msg_ptr->nl_addr_info.attr_info.prefix_addr.ss_family)
 				{
 				    IPACMDBG("Posting IPA_ADDR_ADD_EVENT with if index:%d, ipv6 addr:0x%x:%x:%x:%x\n",
@@ -1381,7 +1383,7 @@ static int ipa_nl_decode_nlmsg
 		    data_all = (ipacm_event_data_all *)malloc(sizeof(ipacm_event_data_all));
 		    if(data_all == NULL)
 			{
-			IPACMERR("unable to allocate memory for event data_all\n");
+		    	IPACMERR("unable to allocate memory for event data_all\n");
 						return IPACM_FAILURE;
 			}
 
@@ -1399,10 +1401,10 @@ static int ipa_nl_decode_nlmsg
 		    }
 		    else if (msg_ptr->nl_neigh_info.attr_info.local_addr.ss_family == AF_INET)
 		    {
-				IPACM_NL_REPORT_ADDR( " ", msg_ptr->nl_neigh_info.attr_info.local_addr);
+   				IPACM_NL_REPORT_ADDR( " ", msg_ptr->nl_neigh_info.attr_info.local_addr);
 				IPACM_EVENT_COPY_ADDR_v4( data_all->ipv4_addr, msg_ptr->nl_neigh_info.attr_info.local_addr);
-			data_all->ipv4_addr = ntohl(data_all->ipv4_addr);
-			data_all->iptype = IPA_IP_v4;
+		    	data_all->ipv4_addr = ntohl(data_all->ipv4_addr);
+		    	data_all->iptype = IPA_IP_v4;
 		    }
 		    else
 		    {
@@ -1419,10 +1421,12 @@ static int ipa_nl_decode_nlmsg
 
 
 		    memcpy(data_all->mac_addr,
-					 msg_ptr->nl_neigh_info.attr_info.lladdr_hwaddr.sa_data,
-					 sizeof(data_all->mac_addr));
+		    			 msg_ptr->nl_neigh_info.attr_info.lladdr_hwaddr.sa_data,
+		    			 sizeof(data_all->mac_addr));
 			data_all->if_index = msg_ptr->nl_neigh_info.metainfo.ndm_ifindex;
+#ifdef FEATURE_L2TP
 			strlcpy(data_all->iface_name, dev_name, sizeof(data_all->iface_name));
+#endif
 			/* Add support to replace src-mac as bridge0 mac */
 			if((msg_ptr->nl_neigh_info.metainfo.ndm_family == AF_BRIDGE) &&
 				(msg_ptr->nl_neigh_info.metainfo.ndm_state == NUD_PERMANENT))
@@ -1431,7 +1435,7 @@ static int ipa_nl_decode_nlmsg
 				evt_data.event = IPA_BRIDGE_LINK_UP_EVENT;
 				IPACMDBG_H("posting IPA_BRIDGE_LINK_UP_EVENT (%s):index:%d \n",
                                  dev_name,
-		                    data_all->if_index);
+ 		                    data_all->if_index);
 			}
 			else
 		    {
@@ -1439,8 +1443,8 @@ static int ipa_nl_decode_nlmsg
 				evt_data.event = IPA_NEW_NEIGH_EVENT;
 				IPACMDBG_H("posting IPA_NEW_NEIGH_EVENT (%s):index:%d ip-family: %d\n",
                                  dev_name,
-		                    data_all->if_index,
-						 msg_ptr->nl_neigh_info.attr_info.local_addr.ss_family);
+ 		                    data_all->if_index,
+		    				 msg_ptr->nl_neigh_info.attr_info.local_addr.ss_family);
 			}
 		    evt_data.evt_data = data_all;
 					IPACM_EvtDispatcher::PostEvt(&evt_data);
@@ -1513,8 +1517,8 @@ static int ipa_nl_decode_nlmsg
 
 		    IPACMDBG_H("posting IPA_DEL_NEIGH_EVENT (%s):index:%d ip-family: %d\n",
                                  dev_name,
-		                    data_all->if_index,
-						 msg_ptr->nl_neigh_info.attr_info.local_addr.ss_family);
+ 		                    data_all->if_index,
+		    				 msg_ptr->nl_neigh_info.attr_info.local_addr.ss_family);
 				evt_data.evt_data = data_all;
 				IPACM_EvtDispatcher::PostEvt(&evt_data);
 				/* finish command queue */
@@ -1621,7 +1625,7 @@ int ipa_get_if_name
 		return IPACM_FAILURE;
 	}
 
-	(void)strlcpy(if_name, ifr.ifr_name, sizeof(ifr.ifr_name));
+	(void)strncpy(if_name, ifr.ifr_name, sizeof(ifr.ifr_name));
 	IPACMDBG("interface name %s\n", ifr.ifr_name);
 	close(fd);
 
@@ -1771,3 +1775,5 @@ int mask_v6(int index, uint32_t *mask)
 
 	}
 }
+
+

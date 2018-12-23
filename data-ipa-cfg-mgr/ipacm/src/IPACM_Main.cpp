@@ -375,8 +375,8 @@ void* ipa_driver_msg_notifier(void *param)
 		        data = (ipacm_event_data_mac *)malloc(sizeof(ipacm_event_data_mac));
 		        if (data == NULL)
 		        {
-			        IPACMERR("unable to allocate memory for event_wlan data\n");
-			        return NULL;
+		    	        IPACMERR("unable to allocate memory for event_wlan data\n");
+		    	        return NULL;
 		        }
 			memcpy(data->mac_addr,
 						 event_wlan->mac_addr,
@@ -408,7 +408,7 @@ void* ipa_driver_msg_notifier(void *param)
 		    if (data_ex == NULL)
 		    {
 				IPACMERR("unable to allocate memory for event data\n");
-			return NULL;
+		    	return NULL;
 		    }
 			data_ex->num_of_attribs = event_ex->num_of_attribs;
 
@@ -462,8 +462,8 @@ void* ipa_driver_msg_notifier(void *param)
 		        data = (ipacm_event_data_mac *)malloc(sizeof(ipacm_event_data_mac));
 		        if (data == NULL)
 		        {
-			        IPACMERR("unable to allocate memory for event_wlan data\n");
-			        return NULL;
+		    	        IPACMERR("unable to allocate memory for event_wlan data\n");
+		    	        return NULL;
 		        }
 			memcpy(data->mac_addr,
 						 event_wlan->mac_addr,
@@ -482,8 +482,8 @@ void* ipa_driver_msg_notifier(void *param)
 		        data = (ipacm_event_data_mac *)malloc(sizeof(ipacm_event_data_mac));
 		        if (data == NULL)
 		        {
-			        IPACMERR("unable to allocate memory for event_wlan data\n");
-			        return NULL;
+		    	        IPACMERR("unable to allocate memory for event_wlan data\n");
+		    	        return NULL;
 		        }
 			memcpy(data->mac_addr,
 						 event_wlan->mac_addr,
@@ -502,8 +502,8 @@ void* ipa_driver_msg_notifier(void *param)
 		        data = (ipacm_event_data_mac *)malloc(sizeof(ipacm_event_data_mac));
 		        if (data == NULL)
 		        {
-			       IPACMERR("unable to allocate memory for event_wlan data\n");
-			       return NULL;
+		    	       IPACMERR("unable to allocate memory for event_wlan data\n");
+		    	       return NULL;
 		        }
 			memcpy(data->mac_addr,
 						 event_wlan->mac_addr,
@@ -712,10 +712,7 @@ void* ipa_driver_msg_notifier(void *param)
 				IPACMERR("calling OffloadMng->elrInstance->onOffloadStopped \n");
 				OffloadMng->elrInstance->onOffloadStopped(IpaEventRelay::ERROR);
 			}
-			/* WA to clean up wlan instances during SSR */
-			evt_data.event = IPA_SSR_NOTICE;
-			evt_data.evt_data = NULL;
-			break;
+			continue;
 		case IPA_SSR_AFTER_POWERUP:
 			IPACMDBG_H("Received IPA_SSR_AFTER_POWERUP\n");
 			OffloadMng = IPACM_OffloadManager::GetInstance();

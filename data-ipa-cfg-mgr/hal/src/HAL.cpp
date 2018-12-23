@@ -40,7 +40,7 @@
 
 /* External Includes */
 #include <cutils/log.h>
-#include <cstring>
+#include <string>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <vector>
@@ -93,7 +93,7 @@ void HAL::registerAsSystemService(const char* name) {
         ALOGI("Successfully registered IOffloadControl");
     }
 
-    ret = IOffloadConfig::registerAsService();
+    IOffloadConfig::registerAsService();
     if (ret != 0) ALOGE("Failed to register IOffloadConfig (%d)", ret);
     else if (DBG) {
         ALOGI("Successfully registered IOffloadConfig");
@@ -407,8 +407,6 @@ Return<void> HAL::setLocalPrefixes
     LocalLogBuffer::FunctionLog fl(__func__);
     fl.addArg("prefixes", prefixesStr);
 
-    memset(&res,0,sizeof(BoolResult));
-
     if (!isInitialized()) {
         BoolResult res = makeInputCheckFailure("Not initialized");
     } else if(prefixesStr.size() < 1) {
@@ -471,9 +469,6 @@ Return<void> HAL::setDataLimit
         fl.setResult(res.success, res.errMsg);
     } else {
         RET ipaReturn = mIPA->setQuota(upstream.c_str(), limit);
-        if(ipaReturn == RET::FAIL_TRY_AGAIN) {
-            ipaReturn = RET::SUCCESS;
-        }
         BoolResult res = ipaResultToBoolResult(ipaReturn);
         hidl_cb(res.success, res.errMsg);
         fl.setResult(res.success, res.errMsg);
@@ -535,8 +530,8 @@ Return<void> HAL::setUpstreamParameters
 	/* send NULL iface string when upstream down */
         RET ipaReturn = mIPA->setUpstream(
                 NULL,
-                v4GwParser.getFirstPrefix(IP_FAM::V4),
-                v6GwParser.getFirstPrefix(IP_FAM::V6));
+                v4GwParser.getFirstPrefix(),
+                v6GwParser.getFirstPrefix());
         BoolResult res = ipaResultToBoolResult(ipaReturn);
         hidl_cb(res.success, res.errMsg);
         fl.setResult(res.success, res.errMsg);

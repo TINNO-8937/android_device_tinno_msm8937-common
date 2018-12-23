@@ -23,7 +23,7 @@
 			<Iface>
 			   <Name>rmnet_data1</Name>
 			   <Category>WAN</Category>
-			</Iface>
+			</Iface>			
 			<Iface>
 			   <Name>rmnet_data2</Name>
 			   <Category>WAN</Category>
@@ -57,7 +57,7 @@
 			   <Name>wlan0</Name>
 			   <Category>UNKNOWN</Category>
 			   <WlanMode>full</WlanMode>
-			</Iface>
+			</Iface>			
 			<Iface>
 			   <Name>wlan1</Name>
 			   <Category>UNKNOWN</Category>
@@ -87,74 +87,74 @@
 		</IPPassthroughFlag>
 		<IPACMPrivateSubnet>
 			<Subnet>
-			   <SubnetAddress>192.168.225.0</SubnetAddress>
-			   <SubnetMask>255.255.255.0</SubnetMask>
-		    </Subnet>
+  			   <SubnetAddress>192.168.225.0</SubnetAddress>
+  			   <SubnetMask>255.255.255.0</SubnetMask>
+		    </Subnet>		
 		</IPACMPrivateSubnet>
 		<IPACMALG>
 			<ALG>
-			   <Protocol>TCP</Protocol>
-			   <Port>21</Port>
+  			   <Protocol>TCP</Protocol>
+  			   <Port>21</Port>
 			   <Description>FTP</Description>
 		    </ALG>
 			<ALG>
-			   <Protocol>TCP</Protocol>
-			   <Port>554</Port>
+  			   <Protocol>TCP</Protocol>
+  			   <Port>554</Port>
 			   <Description>RTSP</Description>
 		    </ALG>
 			<ALG>
-			   <Protocol>TCP</Protocol>
-			   <Port>5060</Port>
+  			   <Protocol>TCP</Protocol>
+  			   <Port>5060</Port>
 			   <Description>SIP</Description>
 		    </ALG>
 			<ALG>
-			   <Protocol>UDP</Protocol>
-			   <Port>5060</Port>
+  			   <Protocol>UDP</Protocol>
+  			   <Port>5060</Port>
 			   <Description>SIP</Description>
 		    </ALG>
 			<ALG>
-			   <Protocol>TCP</Protocol>
-			   <Port>1723</Port>
+  			   <Protocol>TCP</Protocol>
+  			   <Port>1723</Port>
 			   <Description>PPTP</Description>
 		    </ALG>
 			<ALG>
-			   <Protocol>UDP</Protocol>
-			   <Port>69</Port>
+  			   <Protocol>UDP</Protocol>
+  			   <Port>69</Port>
 			   <Description>TFTP</Description>
 		    </ALG>
 			<ALG>
-			   <Protocol>UDP</Protocol>
-			   <Port>53</Port>
+  			   <Protocol>UDP</Protocol>
+  			   <Port>53</Port>
 			   <Description>DNS</Description>
 		    </ALG>
 			<ALG>
-			   <Protocol>TCP</Protocol>
-			   <Port>53</Port>
+  			   <Protocol>TCP</Protocol>
+  			   <Port>53</Port>
 			   <Description>DNS</Description>
 		    </ALG>
 			<ALG>
-			   <Protocol>UDP</Protocol>
-			   <Port>10080</Port>
+  			   <Protocol>UDP</Protocol>
+  			   <Port>10080</Port>
 			   <Description>AMANDA</Description>
 		    </ALG>
 			<ALG>
-			   <Protocol>UDP</Protocol>
-			   <Port>1719</Port>
+  			   <Protocol>UDP</Protocol>
+  			   <Port>1719</Port>
 			   <Description>H323</Description>
 		    </ALG>
 			<ALG>
-			   <Protocol>TCP</Protocol>
-			   <Port>1720</Port>
+  			   <Protocol>TCP</Protocol>
+  			   <Port>1720</Port>
 			   <Description>H323</Description>
 		    </ALG>
 			<ALG>
-			   <Protocol>TCP</Protocol>
-			   <Port>6667</Port>
+  			   <Protocol>TCP</Protocol>
+  			   <Port>6667</Port>
 			   <Description>IRC</Description>
 		    </ALG>
 			<ALG>
-			   <Protocol>UDP</Protocol>
-			   <Port>137</Port>
+  			   <Protocol>UDP</Protocol>
+  			   <Port>137</Port>
 			   <Description>NETBIOS_NS</Description>
 		    </ALG>
 			<ALG>
@@ -163,13 +163,13 @@
 			   <Description>NETBIOS_NS</Description>
 		    </ALG>
 			<ALG>
-			   <Protocol>TCP</Protocol>
-			   <Port>6566</Port>
+  			   <Protocol>TCP</Protocol>
+  			   <Port>6566</Port>
 			   <Description>SANE</Description>
 		    </ALG>
 		</IPACMALG>
-		<IPACMNAT>
-	        <MaxNatEntries>500</MaxNatEntries>
+		<IPACMNAT>		
+ 	        <MaxNatEntries>500</MaxNatEntries>
 		</IPACMNAT>
 		</IPACM>
 </system>

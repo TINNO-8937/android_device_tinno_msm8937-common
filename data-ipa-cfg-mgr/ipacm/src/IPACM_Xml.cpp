@@ -966,7 +966,7 @@ static int IPACM_firewall_xml_parse_tree
 						if(atoi(content_buf)!=0)
 						{
 							config->extd_firewall_entries[config->num_extd_firewall_entries - 1].attrib.attrib_mask |= IPA_FLT_SRC_PORT_RANGE;
-							config->extd_firewall_entries[config->num_extd_firewall_entries - 1].attrib.src_port_lo
+ 							config->extd_firewall_entries[config->num_extd_firewall_entries - 1].attrib.src_port_lo
 								= config->extd_firewall_entries[config->num_extd_firewall_entries - 1].attrib.src_port;
 							config->extd_firewall_entries[config->num_extd_firewall_entries - 1].attrib.src_port_hi
 								= config->extd_firewall_entries[config->num_extd_firewall_entries - 1].attrib.src_port + atoi(content_buf);

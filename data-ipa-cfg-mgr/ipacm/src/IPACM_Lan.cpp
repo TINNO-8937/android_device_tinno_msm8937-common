@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2013-2018, The Linux Foundation. All rights reserved.
+Copyright (c) 2013-2017, The Linux Foundation. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -81,9 +81,7 @@ IPACM_Lan::IPACM_Lan(int iface_index) : IPACM_Iface(iface_index)
 	num_wan_ul_fl_rule_v6 = 0;
 	is_active = true;
 	modem_ul_v4_set = false;
-	v4_mux_id = 0;
 	modem_ul_v6_set = false;
-	v6_mux_id = 0;
 
 	sta_ul_v4_set = false;
 	sta_ul_v6_set = false;
@@ -193,14 +191,6 @@ IPACM_Lan::IPACM_Lan(int iface_index) : IPACM_Iface(iface_index)
 	memset(&prefix, 0, sizeof(prefix));
 
 #ifdef FEATURE_IPACM_HAL
-
-		/* check if Upstream was set before as WIFI with RNDIS case */
-		if(ipa_if_cate == LAN_IF && IPACM_Wan::backhaul_is_sta_mode == true)  /* STA */
-		{
-			IPACMDBG_H(" Skip the Upstream flag set on LAN instance (%d) with WIFI backhaul (%d)\n", ipa_if_cate, IPACM_Wan::backhaul_is_sta_mode ); /* RNDIS+WIFI not support on msm*/
-			return;
-		}
-
 		/* check if Upstream was set before */
 		if (IPACM_Wan::isWanUP(ipa_if_num))
 		{
@@ -235,7 +225,6 @@ void IPACM_Lan::event_callback(ipa_cm_event_id event, void *param)
 	}
 
 	int ipa_interface_index;
-	uint32_t i;
 	ipacm_ext_prop* ext_prop;
 	ipacm_event_iface_up_tehter* data_wan_tether;
 
@@ -270,7 +259,7 @@ void IPACM_Lan::event_callback(ipa_cm_event_id event, void *param)
 			if (rx_prop != NULL || tx_prop != NULL)
 			{
 				IPACMDBG_H(" Has rx/tx properties registered for iface %s, add for NATTING \n", dev_name);
-				IPACM_Iface::ipacmcfg->AddNatIfaces(dev_name, IPA_IP_MAX);
+				IPACM_Iface::ipacmcfg->AddNatIfaces(dev_name);
 			}
 		}
 		break;
@@ -447,18 +436,6 @@ void IPACM_Lan::event_callback(ipa_cm_event_id event, void *param)
 						} else {
 							IPACMDBG_H("Wan_V6 haven't up yet\n");
 						}
-#else
-						/* check if Upstream was set before */
-						if (IPACM_Wan::isWanUP(ipa_if_num))
-						{
-							IPACMDBG_H("Upstream was set previously for ipv4, change is_upstream_set flag\n");
-							is_upstream_set[IPA_IP_v4] = true;
-						}
-						if (IPACM_Wan::isWanUP_V6(ipa_if_num))
-						{
-							IPACMDBG_H("Upstream was set previously for ipv6, change is_upstream_set flag\n");
-							is_upstream_set[IPA_IP_v6] = true;
-						}
 #endif
 						/* Post event to NAT */
 						if (data->iptype == IPA_IP_v4)
@@ -520,45 +497,6 @@ void IPACM_Lan::event_callback(ipa_cm_event_id event, void *param)
 		if (data_wan_tether->if_index_tether != ipa_if_num)
 		{
 			IPACMERR("IPA_HANDLE_WAN_UP_TETHER tether_if(%d), not valid (%d) ignore\n", data_wan_tether->if_index_tether, ipa_if_num);
-			return;
-		}
-#else /* not offload rndis on WIFI mode on MSM targets sky*/
-		if (data_wan_tether->is_sta)
-		{
-			IPACMERR("Not support RNDIS offload on WIFI mode, dun install UL filter rules for WIFI mode\n");
-
-			/* clean rndis  header, routing rules */
-			IPACMDBG_H("left %d eth clients need to be deleted \n ", num_eth_client);
-			for (i = 0; i < num_eth_client; i++)
-			{
-				/* First reset nat rules and then route rules */
-				if(get_client_memptr(eth_client, i)->ipv4_set == true)
-				{
-					IPACMDBG_H("Clean Nat Rules for ipv4:0x%x\n", get_client_memptr(eth_client, i)->v4_addr);
-					CtList->HandleNeighIpAddrDelEvt(get_client_memptr(eth_client, i)->v4_addr);
-				}
-				if (delete_eth_rtrules(i, IPA_IP_v4))
-					IPACMERR("unbale to delete usb-client v4 route rules for index %d\n", i);
-
-				if (delete_eth_rtrules(i, IPA_IP_v6))
-					IPACMERR("unbale to delete ecm-client v6 route rules for index %d\n", i);
-
-				IPACMDBG_H("Delete %d client header\n", num_eth_client);
-
-				if(get_client_memptr(eth_client, i)->ipv4_header_set == true)
-				{
-					if (m_header.DeleteHeaderHdl(get_client_memptr(eth_client, i)->hdr_hdl_v4)
-						== false)
-						IPACMERR("unbale to delete usb-client v4 header for index %d\n", i);
-				}
-
-				if(get_client_memptr(eth_client, i)->ipv6_header_set == true)
-				{
-					if (m_header.DeleteHeaderHdl(get_client_memptr(eth_client, i)->hdr_hdl_v6)
-							== false)
-						IPACMERR("unable to delete usb-client v6 header for index %d\n", i);
-				}
-			} /* end of for loop */
 			return;
 		}
 #endif
@@ -733,7 +671,7 @@ void IPACM_Lan::event_callback(ipa_cm_event_id event, void *param)
 		if (ipa_interface_index == ipa_if_num)
 		{
 			IPACMDBG_H("Received IPA_DOWNSTREAM_ADD event.\n");
-			if (data->prefix.iptype < IPA_IP_MAX && is_downstream_set[data->prefix.iptype] == false)
+			if (is_downstream_set[data->prefix.iptype] == false)
 			{
 				IPACMDBG_H("Add downstream for IP iptype %d\n", data->prefix.iptype);
 				is_downstream_set[data->prefix.iptype] = true;
@@ -892,14 +830,6 @@ void IPACM_Lan::event_callback(ipa_cm_event_id event, void *param)
 			IPACMDBG_H("Recieved IPA_NEIGH_CLIENT_IP_ADDR_ADD_EVENT event \n");
 			IPACMDBG_H("check iface %s category: %d\n", dev_name, ipa_if_cate);
 
-			/* if RNDIS under WIFI mode in MSM, dun add RT rule*/
-#ifdef FEATURE_IPACM_HAL
-			if(IPACM_Wan::backhaul_is_sta_mode == true) /* WIFI */
-			{
-				IPACMDBG_H(" dun construct header and RT-rules for RNDIS-PC in WIFI mode on MSM targets (STA %d) \n", IPACM_Wan::backhaul_is_sta_mode);
-				return;
-			}
-#endif
 			if (ipa_interface_index == ipa_if_num && ipa_if_cate == ODU_IF)
 			{
 				IPACMDBG_H("ODU iface got v4-ip \n");
@@ -926,7 +856,7 @@ void IPACM_Lan::event_callback(ipa_cm_event_id event, void *param)
 				}
 			}
 
-			if (ipa_interface_index == ipa_if_num
+			if (ipa_interface_index == ipa_if_num 
 #ifdef FEATURE_L2TP
 				|| is_vlan_event(data->iface_name) ||
 				|| (is_l2tp_event(data->iface_name) && ipa_if_cate == ODU_IF)
@@ -1179,12 +1109,6 @@ int IPACM_Lan::handle_wan_down(bool is_sta_mode)
 			close(fd);
 			return IPACM_FAILURE;
 		}
-		if (num_wan_ul_fl_rule_v4 == 0)
-		{
-			IPACMERR("No modem UL rules were installed, return...\n");
-			close(fd);
-			return IPACM_FAILURE;
-		}
 		if (m_filtering.DeleteFilteringHdls(wan_ul_fl_rule_hdl_v4,
 			IPA_IP_v4, num_wan_ul_fl_rule_v4) == false)
 		{
@@ -1224,8 +1148,8 @@ int IPACM_Lan::handle_wan_down(bool is_sta_mode)
 		flt_index.retain_header_valid = 1;
 		flt_index.retain_header = 0;
 		flt_index.embedded_call_mux_id_valid = 1;
-		flt_index.embedded_call_mux_id = v4_mux_id;
-		v4_mux_id = 0;
+		flt_index.embedded_call_mux_id = IPACM_Iface::ipacmcfg->GetQmapId();
+
 		if(false == m_filtering.SendFilteringRuleIndex(&flt_index))
 		{
 			IPACMERR("Error sending filtering rule index, aborting...\n");
@@ -1610,8 +1534,8 @@ int IPACM_Lan::handle_wan_up(ipa_ip_type ip_type)
 /* only offload UL traffic of certain clients */
 #ifdef FEATURE_IPACM_HAL
 		flt_rule_entry.rule.attrib.attrib_mask |= IPA_FLT_SRC_ADDR;
-		flt_rule_entry.rule.attrib.u.v4.src_addr_mask = prefix[IPA_IP_v4].v4Mask;
-		flt_rule_entry.rule.attrib.u.v4.src_addr = prefix[IPA_IP_v4].v4Addr;
+		flt_rule_entry.rule.attrib.u.v4.dst_addr_mask = prefix[IPA_IP_v4].v4Mask;
+		flt_rule_entry.rule.attrib.u.v4.dst_addr = prefix[IPA_IP_v4].v4Addr;
 #endif
 		memcpy(&m_pFilteringTable->rules[0], &flt_rule_entry, sizeof(flt_rule_entry));
 		if (false == m_filtering.AddFilteringRule(m_pFilteringTable))
@@ -2128,8 +2052,8 @@ int IPACM_Lan::handle_eth_client_ipaddr(ipacm_event_data_all *data)
 				{
 					if( data->ipv6_addr[0] == get_client_memptr(eth_client, clnt_indx)->v6_addr[v6_num][0] &&
 			           data->ipv6_addr[1] == get_client_memptr(eth_client, clnt_indx)->v6_addr[v6_num][1] &&
-				        data->ipv6_addr[2]== get_client_memptr(eth_client, clnt_indx)->v6_addr[v6_num][2] &&
-				         data->ipv6_addr[3] == get_client_memptr(eth_client, clnt_indx)->v6_addr[v6_num][3])
+			  	        data->ipv6_addr[2]== get_client_memptr(eth_client, clnt_indx)->v6_addr[v6_num][2] &&
+			  	         data->ipv6_addr[3] == get_client_memptr(eth_client, clnt_indx)->v6_addr[v6_num][3])
 					{
 						IPACMDBG_H("Already see this ipv6 addr at position: %d for client:%d\n", v6_num, clnt_indx);
 						return IPACM_FAILURE; /* not setup the RT rules*/
@@ -2230,7 +2154,7 @@ int IPACM_Lan::handle_eth_client_route_rule(uint8_t *mac_addr, ipa_ip_type iptyp
 		    {
 				IPACMDBG_H("Tx:%d, ip-type: %d conflict ip-type: %d no RT-rule added\n",
 						tx_index, tx_prop->tx[tx_index].ip,iptype);
-			        continue;
+		   	        continue;
 		    }
 
 			rt_rule_entry = &rt_rule->rules[0];
@@ -2239,11 +2163,11 @@ int IPACM_Lan::handle_eth_client_route_rule(uint8_t *mac_addr, ipa_ip_type iptyp
 			if (iptype == IPA_IP_v4)
 			{
 		        IPACMDBG_H("client index(%d):ipv4 address: 0x%x\n", eth_index,
-				        get_client_memptr(eth_client, eth_index)->v4_addr);
+		  		        get_client_memptr(eth_client, eth_index)->v4_addr);
 
                 IPACMDBG_H("client(%d): v4 header handle:(0x%x)\n",
-						 eth_index,
-						 get_client_memptr(eth_client, eth_index)->hdr_hdl_v4);
+		  				 eth_index,
+		  				 get_client_memptr(eth_client, eth_index)->hdr_hdl_v4);
 				strlcpy(rt_rule->rt_tbl_name,
 								IPACM_Iface::ipacmcfg->rt_tbl_lan_v4.name,
 								sizeof(rt_rule->rt_tbl_name));
@@ -2253,7 +2177,7 @@ int IPACM_Lan::handle_eth_client_route_rule(uint8_t *mac_addr, ipa_ip_type iptyp
 						 &tx_prop->tx[tx_index].attrib,
 						 sizeof(rt_rule_entry->rule.attrib));
 			    rt_rule_entry->rule.attrib.attrib_mask |= IPA_FLT_DST_ADDR;
-			    rt_rule_entry->rule.hdr_hdl = get_client_memptr(eth_client, eth_index)->hdr_hdl_v4;
+		   	    rt_rule_entry->rule.hdr_hdl = get_client_memptr(eth_client, eth_index)->hdr_hdl_v4;
 				rt_rule_entry->rule.attrib.u.v4.dst_addr = get_client_memptr(eth_client, eth_index)->v4_addr;
 				rt_rule_entry->rule.attrib.u.v4.dst_addr_mask = 0xFFFFFFFF;
 #ifdef FEATURE_IPA_V3
@@ -2268,31 +2192,31 @@ int IPACM_Lan::handle_eth_client_route_rule(uint8_t *mac_addr, ipa_ip_type iptyp
 
 			    /* copy ipv4 RT hdl */
 		        get_client_memptr(eth_client, eth_index)->eth_rt_hdl[tx_index].eth_rt_rule_hdl_v4 =
-		        rt_rule->rules[0].rt_rule_hdl;
+  	   	        rt_rule->rules[0].rt_rule_hdl;
 		        IPACMDBG_H("tx:%d, rt rule hdl=%x ip-type: %d\n", tx_index,
-			get_client_memptr(eth_client, eth_index)->eth_rt_hdl[tx_index].eth_rt_rule_hdl_v4, iptype);
+		      	get_client_memptr(eth_client, eth_index)->eth_rt_hdl[tx_index].eth_rt_rule_hdl_v4, iptype);
 			} else {
 
 		        for(v6_num = get_client_memptr(eth_client, eth_index)->route_rule_set_v6;v6_num < get_client_memptr(eth_client, eth_index)->ipv6_set;v6_num++)
 			    {
                     IPACMDBG_H("client(%d): v6 header handle:(0x%x)\n",
-						 eth_index,
-						 get_client_memptr(eth_client, eth_index)->hdr_hdl_v6);
+		  	    			 eth_index,
+		  	    			 get_client_memptr(eth_client, eth_index)->hdr_hdl_v6);
 
 		            /* v6 LAN_RT_TBL */
 				strlcpy(rt_rule->rt_tbl_name,
-								IPACM_Iface::ipacmcfg->rt_tbl_v6.name,
-								sizeof(rt_rule->rt_tbl_name));
+			    					IPACM_Iface::ipacmcfg->rt_tbl_v6.name,
+			    					sizeof(rt_rule->rt_tbl_name));
 				rt_rule->rt_tbl_name[IPA_RESOURCE_NAME_MAX-1] = '\0';
 		            /* Support QCMAP LAN traffic feature, send to A5 */
 					rt_rule_entry->rule.dst = IPA_CLIENT_APPS_LAN_CONS;
 			        memset(&rt_rule_entry->rule.attrib, 0, sizeof(rt_rule_entry->rule.attrib));
-			        rt_rule_entry->rule.hdr_hdl = 0;
+		   	        rt_rule_entry->rule.hdr_hdl = 0;
 			        rt_rule_entry->rule.attrib.attrib_mask |= IPA_FLT_DST_ADDR;
-			        rt_rule_entry->rule.attrib.u.v6.dst_addr[0] = get_client_memptr(eth_client, eth_index)->v6_addr[v6_num][0];
-			        rt_rule_entry->rule.attrib.u.v6.dst_addr[1] = get_client_memptr(eth_client, eth_index)->v6_addr[v6_num][1];
-			        rt_rule_entry->rule.attrib.u.v6.dst_addr[2] = get_client_memptr(eth_client, eth_index)->v6_addr[v6_num][2];
-			        rt_rule_entry->rule.attrib.u.v6.dst_addr[3] = get_client_memptr(eth_client, eth_index)->v6_addr[v6_num][3];
+		   	        rt_rule_entry->rule.attrib.u.v6.dst_addr[0] = get_client_memptr(eth_client, eth_index)->v6_addr[v6_num][0];
+		   	        rt_rule_entry->rule.attrib.u.v6.dst_addr[1] = get_client_memptr(eth_client, eth_index)->v6_addr[v6_num][1];
+		   	        rt_rule_entry->rule.attrib.u.v6.dst_addr[2] = get_client_memptr(eth_client, eth_index)->v6_addr[v6_num][2];
+		   	        rt_rule_entry->rule.attrib.u.v6.dst_addr[3] = get_client_memptr(eth_client, eth_index)->v6_addr[v6_num][3];
 					rt_rule_entry->rule.attrib.u.v6.dst_addr_mask[0] = 0xFFFFFFFF;
 					rt_rule_entry->rule.attrib.u.v6.dst_addr_mask[1] = 0xFFFFFFFF;
 					rt_rule_entry->rule.attrib.u.v6.dst_addr_mask[2] = 0xFFFFFFFF;
@@ -2309,7 +2233,7 @@ int IPACM_Lan::handle_eth_client_route_rule(uint8_t *mac_addr, ipa_ip_type iptyp
 
 		            get_client_memptr(eth_client, eth_index)->eth_rt_hdl[tx_index].eth_rt_rule_hdl_v6[v6_num] = rt_rule->rules[0].rt_rule_hdl;
 		            IPACMDBG_H("tx:%d, rt rule hdl=%x ip-type: %d\n", tx_index,
-							 get_client_memptr(eth_client, eth_index)->eth_rt_hdl[tx_index].eth_rt_rule_hdl_v6[v6_num], iptype);
+		            				 get_client_memptr(eth_client, eth_index)->eth_rt_hdl[tx_index].eth_rt_rule_hdl_v6[v6_num], iptype);
 
 			        /*Copy same rule to v6 WAN RT TBL*/
 				strlcpy(rt_rule->rt_tbl_name, IPACM_Iface::ipacmcfg->rt_tbl_wan_v6.name, sizeof(rt_rule->rt_tbl_name));
@@ -2319,12 +2243,12 @@ int IPACM_Lan::handle_eth_client_route_rule(uint8_t *mac_addr, ipa_ip_type iptyp
 			        memcpy(&rt_rule_entry->rule.attrib,
 						 &tx_prop->tx[tx_index].attrib,
 						 sizeof(rt_rule_entry->rule.attrib));
-			        rt_rule_entry->rule.hdr_hdl = get_client_memptr(eth_client, eth_index)->hdr_hdl_v6;
+		   	        rt_rule_entry->rule.hdr_hdl = get_client_memptr(eth_client, eth_index)->hdr_hdl_v6;
 			        rt_rule_entry->rule.attrib.attrib_mask |= IPA_FLT_DST_ADDR;
-			        rt_rule_entry->rule.attrib.u.v6.dst_addr[0] = get_client_memptr(eth_client, eth_index)->v6_addr[v6_num][0];
-			        rt_rule_entry->rule.attrib.u.v6.dst_addr[1] = get_client_memptr(eth_client, eth_index)->v6_addr[v6_num][1];
-			        rt_rule_entry->rule.attrib.u.v6.dst_addr[2] = get_client_memptr(eth_client, eth_index)->v6_addr[v6_num][2];
-			        rt_rule_entry->rule.attrib.u.v6.dst_addr[3] = get_client_memptr(eth_client, eth_index)->v6_addr[v6_num][3];
+		   	        rt_rule_entry->rule.attrib.u.v6.dst_addr[0] = get_client_memptr(eth_client, eth_index)->v6_addr[v6_num][0];
+		   	        rt_rule_entry->rule.attrib.u.v6.dst_addr[1] = get_client_memptr(eth_client, eth_index)->v6_addr[v6_num][1];
+		   	        rt_rule_entry->rule.attrib.u.v6.dst_addr[2] = get_client_memptr(eth_client, eth_index)->v6_addr[v6_num][2];
+		   	        rt_rule_entry->rule.attrib.u.v6.dst_addr[3] = get_client_memptr(eth_client, eth_index)->v6_addr[v6_num][3];
 					rt_rule_entry->rule.attrib.u.v6.dst_addr_mask[0] = 0xFFFFFFFF;
 					rt_rule_entry->rule.attrib.u.v6.dst_addr_mask[1] = 0xFFFFFFFF;
 					rt_rule_entry->rule.attrib.u.v6.dst_addr_mask[2] = 0xFFFFFFFF;
@@ -2341,7 +2265,7 @@ int IPACM_Lan::handle_eth_client_route_rule(uint8_t *mac_addr, ipa_ip_type iptyp
 
 		            get_client_memptr(eth_client, eth_index)->eth_rt_hdl[tx_index].eth_rt_rule_hdl_v6_wan[v6_num] = rt_rule->rules[0].rt_rule_hdl;
 					IPACMDBG_H("tx:%d, rt rule hdl=%x ip-type: %d\n", tx_index,
-							 get_client_memptr(eth_client, eth_index)->eth_rt_hdl[tx_index].eth_rt_rule_hdl_v6_wan[v6_num], iptype);
+		            				 get_client_memptr(eth_client, eth_index)->eth_rt_hdl[tx_index].eth_rt_rule_hdl_v6_wan[v6_num], iptype);
 			    }
 			}
 
@@ -2789,9 +2713,9 @@ int IPACM_Lan::handle_eth_client_down_evt(uint8_t *mac_addr)
 			for(num_v6=0;num_v6< get_client_memptr(eth_client, clt_indx)->route_rule_set_v6;num_v6++)
 			{
 			  get_client_memptr(eth_client, clt_indx)->eth_rt_hdl[tx_index].eth_rt_rule_hdl_v6[num_v6] =
-				 get_client_memptr(eth_client, (clt_indx + 1))->eth_rt_hdl[tx_index].eth_rt_rule_hdl_v6[num_v6];
+			   	 get_client_memptr(eth_client, (clt_indx + 1))->eth_rt_hdl[tx_index].eth_rt_rule_hdl_v6[num_v6];
 			  get_client_memptr(eth_client, clt_indx)->eth_rt_hdl[tx_index].eth_rt_rule_hdl_v6_wan[num_v6] =
-				 get_client_memptr(eth_client, (clt_indx + 1))->eth_rt_hdl[tx_index].eth_rt_rule_hdl_v6_wan[num_v6];
+			   	 get_client_memptr(eth_client, (clt_indx + 1))->eth_rt_hdl[tx_index].eth_rt_rule_hdl_v6_wan[num_v6];
 		    }
 		}
 	}
@@ -2869,10 +2793,8 @@ int IPACM_Lan::handle_down_evt()
 		IPACMDBG_H("LAN IF goes down, backhaul type %d\n", IPACM_Wan::backhaul_is_sta_mode);
 		handle_wan_down(IPACM_Wan::backhaul_is_sta_mode);
 #ifdef FEATURE_IPA_ANDROID
-#ifndef FEATURE_IPACM_HAL
 		/* Clean-up tethered-iface list */
 		IPACM_Wan::delete_tether_iface(IPA_IP_v4, ipa_if_num);
-#endif
 #endif
 	}
 
@@ -3125,7 +3047,6 @@ int IPACM_Lan::handle_uplink_filter_rule(ipacm_ext_prop *prop, ipa_ip_type iptyp
 	int fd;
 	int i, index, eq_index;
 	uint32_t value = 0;
-	uint8_t qmap_id;
 
 	IPACMDBG_H("Set modem UL flt rules\n");
 
@@ -3182,8 +3103,7 @@ int IPACM_Lan::handle_uplink_filter_rule(ipacm_ext_prop *prop, ipa_ip_type iptyp
 	flt_index.retain_header_valid = 1;
 	flt_index.retain_header = 0;
 	flt_index.embedded_call_mux_id_valid = 1;
-	qmap_id = IPACM_Iface::ipacmcfg->GetQmapId();
-	flt_index.embedded_call_mux_id = qmap_id;
+	flt_index.embedded_call_mux_id = IPACM_Iface::ipacmcfg->GetQmapId();
 #ifndef FEATURE_IPA_V3
 	IPACMDBG_H("flt_index: src pipe: %d, num of rules: %d, ebd pipe: %d, mux id: %d\n",
 		flt_index.source_pipe_index, flt_index.filter_index_list_len, flt_index.embedded_pipe_index, flt_index.embedded_call_mux_id);
@@ -3264,46 +3184,46 @@ int IPACM_Lan::handle_uplink_filter_rule(ipacm_ext_prop *prop, ipa_ip_type iptyp
 
 #ifdef FEATURE_IPACM_HAL
 		/* add prefix equation in modem UL rules */
-		if(iptype == IPA_IP_v4 && (flt_rule_entry.rule.eq_attrib.num_offset_meq_32 >= 0)
-			&& (flt_rule_entry.rule.eq_attrib.num_offset_meq_32 < IPA_IPFLTR_NUM_MEQ_32_EQNS))
+		if(iptype == IPA_IP_v4)
 		{
 			flt_rule_entry.rule.eq_attrib.num_offset_meq_32++;
-			eq_index = flt_rule_entry.rule.eq_attrib.num_offset_meq_32 - 1;
+			if(flt_rule_entry.rule.eq_attrib.num_offset_meq_32 <= IPA_IPFLTR_NUM_MEQ_32_EQNS)
+			{
+				eq_index = flt_rule_entry.rule.eq_attrib.num_offset_meq_32 - 1;
 #ifdef FEATURE_IPA_V3
-			if(eq_index == 0)
-			{
-				flt_rule_entry.rule.eq_attrib.rule_eq_bitmap |= (1<<5);
-			}
-			else
-			{
-				flt_rule_entry.rule.eq_attrib.rule_eq_bitmap |= (1<<6);
-			}
+				if(eq_index == 0)
+				{
+					flt_rule_entry.rule.eq_attrib.rule_eq_bitmap |= (1<<5);
+				}
+				else
+				{
+					flt_rule_entry.rule.eq_attrib.rule_eq_bitmap |= (1<<6);
+				}
 #else
-			if(eq_index == 0)
-			{
-				flt_rule_entry.rule.eq_attrib.rule_eq_bitmap |= (1<<2);
+				if(eq_index == 0)
+				{
+					flt_rule_entry.rule.eq_attrib.rule_eq_bitmap |= (1<<2);
+				}
+				else
+				{
+					flt_rule_entry.rule.eq_attrib.rule_eq_bitmap |= (1<<3);
+				}
+#endif
+				flt_rule_entry.rule.eq_attrib.offset_meq_32[eq_index].offset = 12;
+				flt_rule_entry.rule.eq_attrib.offset_meq_32[eq_index].mask = prefix[IPA_IP_v4].v4Mask;
+				flt_rule_entry.rule.eq_attrib.offset_meq_32[eq_index].value = prefix[IPA_IP_v4].v4Addr;
 			}
 			else
 			{
-				flt_rule_entry.rule.eq_attrib.rule_eq_bitmap |= (1<<3);
+				IPACMERR("Run out of MEQ32 equation.\n");
+				flt_rule_entry.rule.eq_attrib.num_offset_meq_32--;
 			}
-#endif
-			flt_rule_entry.rule.eq_attrib.offset_meq_32[eq_index].offset = 12;
-			flt_rule_entry.rule.eq_attrib.offset_meq_32[eq_index].mask = prefix[IPA_IP_v4].v4Mask;
-			flt_rule_entry.rule.eq_attrib.offset_meq_32[eq_index].value = prefix[IPA_IP_v4].v4Addr;
-		}
-		else if (flt_rule_entry.rule.eq_attrib.num_offset_meq_32 > IPA_IPFLTR_NUM_MEQ_32_EQNS)
-		{
-			IPACMERR("Run out of MEQ32 equation.\n");
-			flt_rule_entry.rule.eq_attrib.num_offset_meq_32--;
 		}
 		else
 		{
-			if ((flt_rule_entry.rule.eq_attrib.num_offset_meq_128 >= 0) &&
-				(flt_rule_entry.rule.eq_attrib.num_offset_meq_128
-					< IPA_IPFLTR_NUM_MEQ_128_EQNS))
+			flt_rule_entry.rule.eq_attrib.num_offset_meq_128++;
+			if(flt_rule_entry.rule.eq_attrib.num_offset_meq_128 <= IPA_IPFLTR_NUM_MEQ_128_EQNS)
 			{
-				flt_rule_entry.rule.eq_attrib.num_offset_meq_128++;
 				eq_index = flt_rule_entry.rule.eq_attrib.num_offset_meq_128 - 1;
 #ifdef FEATURE_IPA_V3
 				if(eq_index == 0)
@@ -3314,22 +3234,6 @@ int IPACM_Lan::handle_uplink_filter_rule(ipacm_ext_prop *prop, ipa_ip_type iptyp
 				{
 					flt_rule_entry.rule.eq_attrib.rule_eq_bitmap |= (1<<4);
 				}
-				*(uint32_t *)(flt_rule_entry.rule.eq_attrib.offset_meq_128[eq_index].mask + 0)
-						= prefix[IPA_IP_v6].v6Mask[3];
-				*(uint32_t *)(flt_rule_entry.rule.eq_attrib.offset_meq_128[eq_index].mask + 4)
-						= prefix[IPA_IP_v6].v6Mask[2];
-				*(uint32_t *)(flt_rule_entry.rule.eq_attrib.offset_meq_128[eq_index].mask + 8)
-						= prefix[IPA_IP_v6].v6Mask[1];
-				*(uint32_t *)(flt_rule_entry.rule.eq_attrib.offset_meq_128[eq_index].mask + 12)
-						= prefix[IPA_IP_v6].v6Mask[0];
-				*(uint32_t *)(flt_rule_entry.rule.eq_attrib.offset_meq_128[eq_index].value + 0)
-						= prefix[IPA_IP_v6].v6Addr[3];
-				*(uint32_t *)(flt_rule_entry.rule.eq_attrib.offset_meq_128[eq_index].value + 4)
-						= prefix[IPA_IP_v6].v6Addr[2];
-				*(uint32_t *)(flt_rule_entry.rule.eq_attrib.offset_meq_128[eq_index].value + 8)
-						= prefix[IPA_IP_v6].v6Addr[1];
-				*(uint32_t *)(flt_rule_entry.rule.eq_attrib.offset_meq_128[eq_index].value + 12)
-						= prefix[IPA_IP_v6].v6Addr[0];
 #else
 				if(eq_index == 0)
 				{
@@ -3339,24 +3243,24 @@ int IPACM_Lan::handle_uplink_filter_rule(ipacm_ext_prop *prop, ipa_ip_type iptyp
 				{
 					flt_rule_entry.rule.eq_attrib.rule_eq_bitmap |= (1<<10);
 				}
-				*(uint32_t *)(flt_rule_entry.rule.eq_attrib.offset_meq_128[eq_index].mask + 0)
-						= prefix[IPA_IP_v6].v6Mask[0];
-				*(uint32_t *)(flt_rule_entry.rule.eq_attrib.offset_meq_128[eq_index].mask + 4)
-						= prefix[IPA_IP_v6].v6Mask[1];
-				*(uint32_t *)(flt_rule_entry.rule.eq_attrib.offset_meq_128[eq_index].mask + 8)
-						= prefix[IPA_IP_v6].v6Mask[2];
-				*(uint32_t *)(flt_rule_entry.rule.eq_attrib.offset_meq_128[eq_index].mask + 12)
-						= prefix[IPA_IP_v6].v6Mask[3];
-				*(uint32_t *)(flt_rule_entry.rule.eq_attrib.offset_meq_128[eq_index].value + 0)
-						= prefix[IPA_IP_v6].v6Addr[0];
-				*(uint32_t *)(flt_rule_entry.rule.eq_attrib.offset_meq_128[eq_index].value + 4)
-						= prefix[IPA_IP_v6].v6Addr[1];
-				*(uint32_t *)(flt_rule_entry.rule.eq_attrib.offset_meq_128[eq_index].value + 8)
-						= prefix[IPA_IP_v6].v6Addr[2];
-				*(uint32_t *)(flt_rule_entry.rule.eq_attrib.offset_meq_128[eq_index].value + 12)
-						= prefix[IPA_IP_v6].v6Addr[3];
 #endif
 				flt_rule_entry.rule.eq_attrib.offset_meq_128[eq_index].offset = 8;
+				*(uint32_t *)(flt_rule_entry.rule.eq_attrib.offset_meq_128[eq_index].mask + 0)
+					= prefix[IPA_IP_v6].v6Mask[3];
+				*(uint32_t *)(flt_rule_entry.rule.eq_attrib.offset_meq_128[eq_index].mask + 4)
+					= prefix[IPA_IP_v6].v6Mask[2];
+				*(uint32_t *)(flt_rule_entry.rule.eq_attrib.offset_meq_128[eq_index].mask + 8)
+					= prefix[IPA_IP_v6].v6Mask[1];
+				*(uint32_t *)(flt_rule_entry.rule.eq_attrib.offset_meq_128[eq_index].mask + 12)
+					= prefix[IPA_IP_v6].v6Mask[0];
+				*(uint32_t *)(flt_rule_entry.rule.eq_attrib.offset_meq_128[eq_index].value + 0)
+					= prefix[IPA_IP_v6].v6Addr[3];
+				*(uint32_t *)(flt_rule_entry.rule.eq_attrib.offset_meq_128[eq_index].value + 4)
+					= prefix[IPA_IP_v6].v6Addr[2];
+				*(uint32_t *)(flt_rule_entry.rule.eq_attrib.offset_meq_128[eq_index].value + 8)
+					= prefix[IPA_IP_v6].v6Addr[1];
+				*(uint32_t *)(flt_rule_entry.rule.eq_attrib.offset_meq_128[eq_index].value + 12)
+					= prefix[IPA_IP_v6].v6Addr[0];
 			}
 			else
 			{
@@ -3413,7 +3317,6 @@ int IPACM_Lan::handle_uplink_filter_rule(ipacm_ext_prop *prop, ipa_ip_type iptyp
 				num_wan_ul_fl_rule_v4++;
 			}
 			IPACM_Iface::ipacmcfg->increaseFltRuleCount(rx_prop->rx[0].src_pipe, iptype, pFilteringTable->num_rules);
-			v4_mux_id = qmap_id;
 		}
 		else if(iptype == IPA_IP_v6)
 		{
@@ -3423,9 +3326,7 @@ int IPACM_Lan::handle_uplink_filter_rule(ipacm_ext_prop *prop, ipa_ip_type iptyp
 				num_wan_ul_fl_rule_v6++;
 			}
 			IPACM_Iface::ipacmcfg->increaseFltRuleCount(rx_prop->rx[0].src_pipe, iptype, pFilteringTable->num_rules);
-			v6_mux_id = qmap_id;
 		}
-
 		else
 		{
 			IPACMERR("IP type is not expected.\n");
@@ -3509,8 +3410,7 @@ int IPACM_Lan::handle_wan_down_v6(bool is_sta_mode)
 		flt_index.retain_header_valid = 1;
 		flt_index.retain_header = 0;
 		flt_index.embedded_call_mux_id_valid = 1;
-		flt_index.embedded_call_mux_id = v6_mux_id;
-		v6_mux_id = 0;
+		flt_index.embedded_call_mux_id = IPACM_Iface::ipacmcfg->GetQmapId();
 		if(false == m_filtering.SendFilteringRuleIndex(&flt_index))
 		{
 			IPACMERR("Error sending filtering rule index, aborting...\n");
@@ -4398,7 +4298,6 @@ void IPACM_Lan::eth_bridge_post_event(ipa_cm_event_id evt, ipa_ip_type iptype, u
 {
 	ipacm_cmd_q_data eth_bridge_evt;
 	ipacm_event_eth_bridge *evt_data_eth_bridge;
-	const char *eventName = IPACM_Iface::ipacmcfg->getEventName(evt);
 #ifdef FEATURE_L2TP
 	ipacm_event_data_all *evt_data_all;
 #endif
@@ -4467,11 +4366,8 @@ void IPACM_Lan::eth_bridge_post_event(ipa_cm_event_id evt, ipa_ip_type iptype, u
 		}
 		eth_bridge_evt.evt_data = (void*)evt_data_eth_bridge;
 	}
-	if (eventName != NULL)
-	{
-		IPACMDBG_H("Posting event %s\n",
-				eventName);
-	}
+	IPACMDBG_H("Posting event %s\n",
+		IPACM_Iface::ipacmcfg->getEventName(evt));
 	IPACM_EvtDispatcher::PostEvt(&eth_bridge_evt);
 }
 

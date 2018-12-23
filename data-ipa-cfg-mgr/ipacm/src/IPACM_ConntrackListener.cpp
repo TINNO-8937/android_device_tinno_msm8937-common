@@ -1,6 +1,5 @@
 /*
-Copyright (c) 2013-2018, The Linux Foundation. All rights reserved.
-
+Copyright (c) 2013-2016, The Linux Foundation. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -388,32 +387,38 @@ int IPACM_ConntrackListener::CreateConnTrackThreads(void)
 
 	if(isCTReg == false)
 	{
-		ret = pthread_create(&tcp_thread, NULL, IPACM_ConntrackClient::TCPRegisterWithConnTrack, NULL);
-		if(0 != ret)
+		if(!tcp_thread)
 		{
-			IPACMERR("unable to create TCP conntrack event listner thread\n");
-			PERROR("unable to create TCP conntrack\n");
-			goto error;
+			ret = pthread_create(&tcp_thread, NULL, IPACM_ConntrackClient::TCPRegisterWithConnTrack, NULL);
+			if(0 != ret)
+			{
+				IPACMERR("unable to create TCP conntrack event listner thread\n");
+				PERROR("unable to create TCP conntrack\n");
+				return -1;
+			}
+
+			IPACMDBG("created TCP conntrack event listner thread\n");
+			if(pthread_setname_np(tcp_thread, "tcp ct listener") != 0)
+			{
+				IPACMERR("unable to set thread name\n");
+			}
 		}
 
-		IPACMDBG("created TCP conntrack event listner thread\n");
-		if(pthread_setname_np(tcp_thread, "tcp ct listener") != 0)
+		if(!udp_thread)
 		{
-			IPACMERR("unable to set thread name\n");
-		}
+			ret = pthread_create(&udp_thread, NULL, IPACM_ConntrackClient::UDPRegisterWithConnTrack, NULL);
+			if(0 != ret)
+			{
+				IPACMERR("unable to create UDP conntrack event listner thread\n");
+				PERROR("unable to create UDP conntrack\n");
+				goto error;
+			}
 
-		ret = pthread_create(&udp_thread, NULL, IPACM_ConntrackClient::UDPRegisterWithConnTrack, NULL);
-		if(0 != ret)
-		{
-			IPACMERR("unable to create UDP conntrack event listner thread\n");
-			PERROR("unable to create UDP conntrack\n");
-			goto error;
-		}
-
-		IPACMDBG("created UDP conntrack event listner thread\n");
-		if(pthread_setname_np(udp_thread, "udp ct listener") != 0)
-		{
-			IPACMERR("unable to set thread name\n");
+			IPACMDBG("created UDP conntrack event listner thread\n");
+			if(pthread_setname_np(udp_thread, "udp ct listener") != 0)
+			{
+				IPACMERR("unable to set thread name\n");
+			}
 		}
 
 		isCTReg = true;
@@ -431,18 +436,21 @@ int IPACM_ConntrackListener::CreateNatThreads(void)
 
 	if(isNatThreadStart == false)
 	{
-		ret = pthread_create(&udpcto_thread, NULL, IPACM_ConntrackClient::UDPConnTimeoutUpdate, NULL);
-		if(0 != ret)
+		if(!udpcto_thread)
 		{
-			IPACMERR("unable to create udp conn timeout thread\n");
-			PERROR("unable to create udp conn timeout\n");
-			goto error;
-		}
+			ret = pthread_create(&udpcto_thread, NULL, IPACM_ConntrackClient::UDPConnTimeoutUpdate, NULL);
+			if(0 != ret)
+			{
+				IPACMERR("unable to create udp conn timeout thread\n");
+				PERROR("unable to create udp conn timeout\n");
+				goto error;
+			}
 
-		IPACMDBG("created upd conn timeout thread\n");
-		if(pthread_setname_np(udpcto_thread, "udp conn timeout") != 0)
-		{
-			IPACMERR("unable to set thread name\n");
+			IPACMDBG("created upd conn timeout thread\n");
+			if(pthread_setname_np(udpcto_thread, "udp conn timeout") != 0)
+			{
+				IPACMERR("unable to set thread name\n");
+			}
 		}
 
 		isNatThreadStart = true;
@@ -537,9 +545,9 @@ void ParseCTV6Message(struct nf_conntrack *ct)
 
 	 nfct_get_attr_grp(ct, ATTR_GRP_ORIG_IPV6, (void *)&orig_params);
 	 IPACMDBG("Orig src_v6_addr: 0x%08x%08x%08x%08x\n", orig_params.src[0], orig_params.src[1],
-			orig_params.src[2], orig_params.src[3]);
+                	orig_params.src[2], orig_params.src[3]);
 	IPACMDBG("Orig dst_v6_addr: 0x%08x%08x%08x%08x\n", orig_params.dst[0], orig_params.dst[1],
-			orig_params.dst[2], orig_params.dst[3]);
+                	orig_params.dst[2], orig_params.dst[3]);
 
 	 IPACMDBG("ATTR_PORT_SRC = ATTR_ORIG_PORT_SRC: 0x%x\n", nfct_get_attr_u16(ct, ATTR_ORIG_PORT_SRC));
 	 IPACMDBG("ATTR_PORT_DST = ATTR_ORIG_PORT_DST: 0x%x\n", nfct_get_attr_u16(ct, ATTR_ORIG_PORT_DST));
@@ -617,24 +625,24 @@ void IPACM_ConntrackListener::ProcessCTV6Message(void *param)
 	memcpy(lan2lan_conn.src_ipv6_addr, orig_params.src,
 				 sizeof(lan2lan_conn.src_ipv6_addr));
     IPACMDBG("Before convert, src_v6_addr: 0x%08x%08x%08x%08x\n", lan2lan_conn.src_ipv6_addr[0], lan2lan_conn.src_ipv6_addr[1],
-			lan2lan_conn.src_ipv6_addr[2], lan2lan_conn.src_ipv6_addr[3]);
+                	lan2lan_conn.src_ipv6_addr[2], lan2lan_conn.src_ipv6_addr[3]);
     for(int cnt=0; cnt<4; cnt++)
 	{
 	   lan2lan_conn.src_ipv6_addr[cnt] = ntohl(lan2lan_conn.src_ipv6_addr[cnt]);
 	}
 	IPACMDBG("After convert src_v6_addr: 0x%08x%08x%08x%08x\n", lan2lan_conn.src_ipv6_addr[0], lan2lan_conn.src_ipv6_addr[1],
-			lan2lan_conn.src_ipv6_addr[2], lan2lan_conn.src_ipv6_addr[3]);
+                	lan2lan_conn.src_ipv6_addr[2], lan2lan_conn.src_ipv6_addr[3]);
 
 	memcpy(lan2lan_conn.dst_ipv6_addr, orig_params.dst,
 				 sizeof(lan2lan_conn.dst_ipv6_addr));
 	IPACMDBG("Before convert, dst_ipv6_addr: 0x%08x%08x%08x%08x\n", lan2lan_conn.dst_ipv6_addr[0], lan2lan_conn.dst_ipv6_addr[1],
-			lan2lan_conn.dst_ipv6_addr[2], lan2lan_conn.dst_ipv6_addr[3]);
+                	lan2lan_conn.dst_ipv6_addr[2], lan2lan_conn.dst_ipv6_addr[3]);
     for(int cnt=0; cnt<4; cnt++)
 	{
 	   lan2lan_conn.dst_ipv6_addr[cnt] = ntohl(lan2lan_conn.dst_ipv6_addr[cnt]);
 	}
 	IPACMDBG("After convert, dst_ipv6_addr: 0x%08x%08x%08x%08x\n", lan2lan_conn.dst_ipv6_addr[0], lan2lan_conn.dst_ipv6_addr[1],
-			lan2lan_conn.dst_ipv6_addr[2], lan2lan_conn.dst_ipv6_addr[3]);
+                	lan2lan_conn.dst_ipv6_addr[2], lan2lan_conn.dst_ipv6_addr[3]);
 
 	if(((IPPROTO_UDP == l4proto) && (NFCT_T_NEW == evt_data->type)) ||
 		 ((IPPROTO_TCP == l4proto) &&
@@ -1038,9 +1046,9 @@ void IPACM_ConntrackListener::ProcessTCPorUDPMsg(
 	 nat_entry.ct = ct;
 	 nat_entry.type = type;
 
-	memset(&rule, 0, sizeof(rule));
-	IPACMDBG("Received type:%d with proto:%d\n", type, l4proto);
-	status = nfct_get_attr_u32(ct, ATTR_STATUS);
+ 	 memset(&rule, 0, sizeof(rule));
+	 IPACMDBG("Received type:%d with proto:%d\n", type, l4proto);
+	 status = nfct_get_attr_u32(ct, ATTR_STATUS);
 
 	 /* Retrieve Protocol */
 	 rule.protocol = nfct_get_attr_u8(ct, ATTR_REPL_L4PROTO);
@@ -1090,40 +1098,47 @@ void IPACM_ConntrackListener::ProcessTCPorUDPMsg(
 #ifdef CT_OPT
 			HandleLan2Lan(ct, type, &rule);
 #endif
-			IPACMDBG("Neither source Nor destination nat\n");
-			goto IGNORE;
+			return;
 		}
-	}
+	 }
 
-	PopulateTCPorUDPEntry(ct, status, &rule);
-	rule.public_ip = wan_ipaddr;
+	 if(IPS_DST_NAT == status || IPS_SRC_NAT == status)
+	 {
+		 PopulateTCPorUDPEntry(ct, status, &rule);
+		 rule.public_ip = wan_ipaddr;
+	 }
+	 else
+	 {
+		 IPACMDBG("Neither source Nor destination nat\n");
+		 goto IGNORE;
+	 }
 
-	if (rule.private_ip != wan_ipaddr)
-	{
-		isAdd = AddIface(&rule, &nat_entry.isTempEntry);
-		if (!isAdd)
-		{
-			goto IGNORE;
-		}
-	}
-	else
-	{
-		if (isStaMode)
-		{
-			IPACMDBG("In STA mode, ignore connections destinated to STA interface\n");
-			goto IGNORE;
-		}
+	 if (rule.private_ip != wan_ipaddr)
+	 {
+		 isAdd = AddIface(&rule, &nat_entry.isTempEntry);
+		 if (!isAdd)
+		 {
+			 goto IGNORE;
+		 }
+	 }
+	 else
+	 {
+		 if (isStaMode)
+		 {
+			 IPACMDBG("In STA mode, ignore connections destinated to STA interface\n");
+			 goto IGNORE;
+		 }
 
-		IPACMDBG("For embedded connections add dummy nat rule\n");
-		IPACMDBG("Change private port %d to %d\n",
-				rule.private_port, rule.public_port);
-		rule.private_port = rule.public_port;
-	}
+		 IPACMDBG("For embedded connections add dummy nat rule\n");
+		 IPACMDBG("Change private port %d to %d\n",
+				  rule.private_port, rule.public_port);
+		 rule.private_port = rule.public_port;
+	 }
 
-	CheckSTAClient(&rule, &nat_entry.isTempEntry);
-	nat_entry.rule = &rule;
-	AddORDeleteNatEntry(&nat_entry);
-	return;
+	 CheckSTAClient(&rule, &nat_entry.isTempEntry);
+	 nat_entry.rule = &rule;
+	 AddORDeleteNatEntry(&nat_entry);
+	 return;
 
 IGNORE:
 	IPACMDBG_H("ignoring below Nat Entry\n");
