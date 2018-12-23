@@ -91,3 +91,4 @@ public:
 } // namespace loc_core
 
 #endif // #ifndef __IDATAITEMINDEX_H__
+

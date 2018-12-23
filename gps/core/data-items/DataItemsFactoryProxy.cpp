@@ -95,3 +95,5 @@ void DataItemsFactoryProxy::closeDataItemLibraryHandle()
 }
 
 } // namespace loc_core
+
+

@@ -2206,3 +2206,4 @@ typedef struct {
 __END_DECLS
 
 #endif /* LOC_GPS_H */
+

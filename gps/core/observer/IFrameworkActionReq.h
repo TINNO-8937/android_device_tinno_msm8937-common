@@ -80,3 +80,4 @@ public:
 } // namespace loc_core
 
 #endif // #ifndef __IFRAMEWORKACTIONREQ_H__
+
