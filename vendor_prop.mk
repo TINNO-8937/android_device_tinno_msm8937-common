@@ -51,7 +51,7 @@ persist.bt.enable.multicast=1 \
 persist.bt.max.a2dp.connections=2 \
 ro.qualcomm.bt.hci_transport=smd \
 ro.bluetooth.hfp.ver=1.7 \
-qcom.bluetooth.soc=smd 
+vendor.qcom.bluetooth.soc=smd
 
 # Camera
 PRODUCT_PROPERTY_OVERRIDES += \
