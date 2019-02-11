@@ -174,14 +174,7 @@ on property:init.svc.surfaceflinger=restarting
     start hwcomposer-2-1
 
 on charger
-    wait /dev/block/bootdevice/by-name/system
-    mount ext4 /dev/block/bootdevice/by-name/system /system ro barrier=1
-    load_all_props
-    trigger load_system_props_action
     setprop sys.usb.configfs 0
-    setprop persist.sys.usb.config mass_storage
-    start qcom-post-boot
-    setprop persist.sys.usb.config mass_storage
     start hvdcp_opti
     start vendor.power_off_alarm
 
