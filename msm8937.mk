@@ -344,11 +344,15 @@ PRODUCT_PACKAGES += \
 
 # Wi-Fi
 PRODUCT_PACKAGES += \
+    libwifi-hal-qcom \
+    libcld80211 \
     android.hardware.wifi@1.0-service \
     libqsap_sdk \
     libQWiFiSoftApCfg \
     libwpa_client \
     hostapd \
+    dhcpcd.conf \
+    wificond \
     wpa_supplicant \
     wpa_supplicant.conf \
     wcnss_service
