@@ -39,7 +39,6 @@
 #include <stdlib.h>
 #include "hardware/gralloc.h"
 #include <utils/Timers.h>
-#include <sys/stat.h>
 
 // Camera dependencies
 #include "QCamera3Channel.h"
@@ -502,7 +501,7 @@ void QCamera3Channel::dumpYUV(mm_camera_buf_def_t *frame, cam_dimension_t dim,
     memset(buf, 0, sizeof(buf));
     static int counter = 0;
     char prop[PROPERTY_VALUE_MAX];
-    property_get("persist.vendor.camera.dumpimg", prop, "0");
+    property_get("persist.camera.dumpimg", prop, "0");
     mYUVDump = (uint32_t)atoi(prop);
     if (mYUVDump & dump_type) {
         mFrmNum = ((mYUVDump & 0xffff0000) >> 16);
@@ -606,7 +605,7 @@ bool QCamera3Channel::isUBWCEnabled()
     //Disable UBWC if Eztune is enabled
     //EzTune process CPP output frame and cannot understand UBWC.
     memset(value, 0, sizeof(value));
-    property_get("persist.vendor.camera.eztune.enable", value, "0");
+    property_get("persist.camera.eztune.enable", value, "0");
     prop_value = atoi(value);
     if (prop_value) {
         return FALSE;
@@ -637,7 +636,7 @@ cam_format_t QCamera3Channel::getStreamDefaultFormat(cam_stream_type_t type)
             char prop[PROPERTY_VALUE_MAX];
             int pFormat;
             memset(prop, 0, sizeof(prop));
-            property_get("persist.vendor.camera.preview.ubwc", prop, "1");
+            property_get("persist.camera.preview.ubwc", prop, "1");
             pFormat = atoi(prop);
             if (pFormat == 1) {
                 streamFormat = CAM_FORMAT_YUV_420_NV12_UBWC;
@@ -657,7 +656,7 @@ cam_format_t QCamera3Channel::getStreamDefaultFormat(cam_stream_type_t type)
             char prop[PROPERTY_VALUE_MAX];
             int pFormat;
             memset(prop, 0, sizeof(prop));
-            property_get("persist.vendor.camera.video.ubwc", prop, "1");
+            property_get("persist.camera.video.ubwc", prop, "1");
             pFormat = atoi(prop);
             if (pFormat == 1) {
                 streamFormat = CAM_FORMAT_YUV_420_NV12_UBWC;
@@ -1719,34 +1718,6 @@ int32_t QCamera3ProcessingChannel::releaseOfflineMemory(uint32_t resultFrameNumb
     return rc;
 }
 
-int32_t QCamera3ProcessingChannel::releaseInputBuffer(uint32_t resultFrameNumber)
-{
-    int32_t rc = NO_ERROR;
-    int32_t inputBufIndex =
-            mOfflineMemory.getGrallocBufferIndex(resultFrameNumber);
-    if (0 <= inputBufIndex) {
-        rc = mOfflineMemory.unregisterBuffer(inputBufIndex);
-    } else {
-        LOGW("Could not find offline input buffer, resultFrameNumber %d",
-                 resultFrameNumber);
-    }
-    if (rc != NO_ERROR) {
-        LOGE("Failed to unregister offline input buffer");
-    }
-
-    return rc;
-}
-
-bool QCamera3ProcessingChannel::isFwkInputBuffer(uint32_t resultFrameNumber)
-{
-    int32_t inputBufIndex =
-                mOfflineMemory.getGrallocBufferIndex(resultFrameNumber);
-    if (0 <= inputBufIndex)
-        return true;
-    else
-        return false;
-}
-
 /* Regular Channel methods */
 /*===========================================================================
  * FUNCTION   : QCamera3RegularChannel
@@ -2178,7 +2149,7 @@ QCamera3RawChannel::QCamera3RawChannel(uint32_t cam_handle,
                         mIsRaw16(raw_16)
 {
     char prop[PROPERTY_VALUE_MAX];
-    property_get("persist.vendor.camera.raw.debug.dump", prop, "0");
+    property_get("persist.camera.raw.debug.dump", prop, "0");
     mRawDump = atoi(prop);
 }
 
@@ -2397,7 +2368,7 @@ QCamera3RawDumpChannel::QCamera3RawDumpChannel(uint32_t cam_handle,
                         mMemory(NULL)
 {
     char prop[PROPERTY_VALUE_MAX];
-    property_get("persist.vendor.camera.raw.dump", prop, "0");
+    property_get("persist.camera.raw.dump", prop, "0");
     mRawDump = atoi(prop);
 }
 
@@ -3297,9 +3268,8 @@ void QCamera3PicChannel::jpegEvtHandle(jpeg_job_status_t status,
                     LOGE("could not find the input meta buf index, frame number %d",
                              resultFrameNumber);
                 }
-            } else {
-                obj->m_postprocessor.releaseOfflineBuffers(false);
             }
+            obj->m_postprocessor.releaseOfflineBuffers(false);
             obj->m_postprocessor.releaseJpegJobData(job);
             free(job);
         }
@@ -4029,12 +3999,6 @@ void QCamera3ReprocessChannel::streamCbRoutine(mm_camera_super_buf_t *super_fram
         stream->getFrameDimension(dim);
         stream->getFrameOffset(offset);
         dumpYUV(frame->bufs[0], dim, offset, QCAMERA_DUMP_FRM_SNAPSHOT);
-        bool isInputBuf = obj->isFwkInputBuffer((uint32_t)resultFrameNumber);
-        if (isInputBuf) {
-            obj->m_postprocessor.releaseOfflineBuffers(false);
-            obj->releaseInputBuffer(resultFrameNumber);
-        }
-
         /* Since reprocessing is done, send the callback to release the input buffer */
         if (mChannelCB) {
             mChannelCB(NULL, NULL, resultFrameNumber, true, mUserData);
@@ -4055,9 +4019,9 @@ void QCamera3ReprocessChannel::streamCbRoutine(mm_camera_super_buf_t *super_fram
             LOGE("Error %d unregistering stream buffer %d",
                      rc, frameIndex);
         }
+        obj->reprocessCbRoutine(resultBuffer, resultFrameNumber);
 
         obj->m_postprocessor.releaseOfflineBuffers(false);
-        obj->reprocessCbRoutine(resultBuffer, resultFrameNumber);
         qcamera_hal3_pp_data_t *pp_job = obj->m_postprocessor.dequeuePPJob(resultFrameNumber);
         if (pp_job != NULL) {
             obj->m_postprocessor.releasePPJobData(pp_job);
