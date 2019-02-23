@@ -32,7 +32,7 @@
 
 // System dependencies
 #include <string.h>
-#include <media/msmb_isp.h>
+#include <media/msmb_isp_n.h>
 
 // Camera dependencies
 #include "cam_types.h"
@@ -602,7 +602,7 @@ typedef struct {
 } cam_stream_img_prop_t;
 
 typedef struct {
-    uint8_t enableStream; /*0 – stop and 1-start */
+    uint8_t enableStream; /*0 \96 stop and 1-start */
 } cam_request_frames;
 
 typedef struct {
