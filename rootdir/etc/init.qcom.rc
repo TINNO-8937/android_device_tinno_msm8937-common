@@ -164,7 +164,6 @@ on boot
 
     mkdir /persist/drm 0770 system system
     mkdir /persist/misc 0770 system system
-    mkdir /persist/secnvm 0770 system system
 
     #Create NETMGR daemon socket area
     mkdir /dev/socket/netmgr 0750 radio radio
@@ -251,9 +250,6 @@ on boot
     chown root system /sys/class/leds/red/blink
     chown root system /sys/class/leds/green/blink
     chown root system /sys/class/leds/blue/blink
-
-    # Create vpp directory
-    mkdir /persist/vpp 0770 media media
 
     service loggy /vendor/bin/loggy.sh
        class core
