@@ -245,12 +245,16 @@ on boot
     chown wifi wifi /sys/module/wlan/parameters/fwpath
 
     # LEDS
-    chown system system /sys/class/leds/red_blink/brightness
-    chown system system /sys/class/leds/green_blink/brightness
-    chown system system /sys/class/leds/blue_blink/brightness
-    chown system system /sys/class/leds/red_breath/brightness
-    chown system system /sys/class/leds/green_breath/brightness
-    chown system system /sys/class/leds/blue_breath/brightness
+    chown root system /sys/class/leds/red_blink/brightness
+    chown root system /sys/class/leds/green_blink/brightness
+    chown root system /sys/class/leds/blue_blink/brightness
+    chown root system /sys/class/leds/red_breath/brightness
+    chown root system /sys/class/leds/green_breath/brightness
+    chown root system /sys/class/leds/blue_breath/brightness
+
+    chown root system /sys/class/leds/red/blink
+    chown root system /sys/class/leds/green/blink
+    chown root system /sys/class/leds/blue/blink
 
     # Create vpp directory
     mkdir /persist/vpp 0770 media media
