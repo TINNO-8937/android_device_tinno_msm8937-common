@@ -36,6 +36,8 @@ using android::sp;
 
 bool is_goodix = false;
 
+static constexpr char kGoodixFpDev[] = "/dev/goodix_fp";
+
 int main() {
     char vend[PROPERTY_VALUE_MAX];
     property_get("ro.hardware.fingerprint", vend, "none");
@@ -54,6 +56,11 @@ int main() {
     android::sp<IBiometricsFingerprint> bio = BiometricsFingerprint::getInstance();
 
     if (is_goodix) {
+        if (access(kGoodixFpDev, F_OK) != 0) {
+            ALOGE("Cannot access %s (%s)", kGoodixFpDev, strerror(errno));
+            return 1;
+        }
+
         // the conventional HAL might start binder services
         android::ProcessState::initWithDriver("/dev/binder");
         android::ProcessState::self()->startThreadPool();
