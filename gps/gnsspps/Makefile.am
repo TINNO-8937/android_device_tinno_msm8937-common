@@ -1,6 +1,7 @@
 AM_CFLAGS = \
      $(LOCPLA_CFLAGS) \
      $(GPSUTILS_CFLAGS) \
+     -I$(WORKSPACE)/system/core/include \
      -I./
 
 ACLOCAL_AMFLAGS = -I m4
@@ -30,3 +31,7 @@ library_includedir = $(pkgincludedir)
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = gnsspps.pc
 EXTRA_DIST = $(pkgconfig_DATA)
+
+
+
+
