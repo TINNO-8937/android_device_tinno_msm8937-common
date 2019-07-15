@@ -1,0 +1,13 @@
+allow servicemanager gx_fpd:dir search;
+allow servicemanager gx_fpd:file { read open };
+allow servicemanager gx_fpd:process getattr;
+allow servicemanager mm-qcamerad:dir search;
+allow servicemanager mm-qcamerad:file { read open };
+allow servicemanager mm-qcamerad:process getattr;
+allow servicemanager init:dir search;
+allow servicemanager init:file { read open };
+allow servicemanager init:process getattr;
+allow servicemanager init:binder { call transfer };
+allow servicemanager hal_fingerprint_default:process { getattr };
+allow servicemanager hal_fingerprint_default:dir { search };
+allow servicemanager hal_fingerprint_default:file { r_file_perms read open };

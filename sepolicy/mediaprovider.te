@@ -1,0 +1,1 @@
+allow mediaprovider shell_data_file:dir { getattr remove_name add_name };

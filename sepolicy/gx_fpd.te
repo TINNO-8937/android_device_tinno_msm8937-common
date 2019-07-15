@@ -1,0 +1,23 @@
+#============= gx_fpd ==============
+type gx_fpd, domain;
+typeattribute gx_fpd domain, binder_in_vendor_violators;
+type gx_fpd_exec, exec_type, vendor_file_type, file_type;
+init_daemon_domain(gx_fpd)
+
+allow gx_fpd binder_device:chr_file { read write ioctl open };
+allow gx_fpd gx_fpd_service:service_manager add;
+allow gx_fpd firmware_file:file { read getattr open };
+allow gx_fpd firmware_file:dir search;
+allow gx_fpd firmware_file:lnk_file read;
+allow gx_fpd gx_fpd_device:chr_file { read write ioctl open };
+allow gx_fpd hal_fingerprint_default:binder transfer;
+allow gx_fpd init:unix_stream_socket connectto;
+allow gx_fpd property_socket:sock_file write;
+allow gx_fpd self:capability dac_override;
+allow gx_fpd servicemanager:binder { transfer call };
+allow gx_fpd tee_device:chr_file { read write ioctl open };
+allow gx_fpd hal_fingerprint_default:binder call;
+allow gx_fpd ion_device:chr_file { read ioctl open };
+allow gx_fpd system_prop:property_service set;
+allow gx_fpd vfat:dir search;
+allow gx_fpd vfat:file { read open write getattr };
