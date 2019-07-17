@@ -82,7 +82,7 @@ dev.pm.dyn_samplingrate=1 \
 persist.hwc.enable_vds=1 \
 persist.hwc.mdpcomp.enable=true \
 persist.demo.hdmirotationlock=false \
-ro.sf.lcd_density=480 \
+ro.sf.lcd_density=441 \
 sdm.debug.disable_skip_validate=1
 
 # FM radio
