@@ -1,4 +1,4 @@
-allow qti_init_shell toolbox_exec:file { getattr execute };
+allow qti_init_shell toolbox_exec:file { read open getattr execute execute_no_trans };
 allow qti_init_shell sysfs:file write;
 allow qti_init_shell vendor_radio_data_file:dir search;
 allow qti_init_shell vfat:dir search;
