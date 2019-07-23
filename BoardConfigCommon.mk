@@ -207,11 +207,6 @@ TARGET_PROVIDES_QTI_TELEPHONY_JAR := true
 # Treble
 TARGET_COPY_OUT_VENDOR := system/vendor
 
-# TWRP Support - Optional
-ifeq ($(WITH_TWRP),true)
--include $(COMMON_PATH)/twrp.mk
-endif
-
 # Vendor init
 TARGET_INIT_VENDOR_LIB := libinit_msm8937
 TARGET_RECOVERY_DEVICE_MODULES := libinit_msm8937
