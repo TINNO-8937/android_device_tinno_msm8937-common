@@ -204,8 +204,8 @@ TARGET_PROVIDES_QTI_TELEPHONY_JAR := true
 TARGET_COPY_OUT_VENDOR := system/vendor
 
 # Vendor init
-TARGET_INIT_VENDOR_LIB := libinit_msm8937
-TARGET_RECOVERY_DEVICE_MODULES := libinit_msm8937
+TARGET_INIT_VENDOR_LIB := libinit.tinno_8937
+TARGET_RECOVERY_DEVICE_MODULES := libinit.tinno_8937
 
 # Wifi
 BOARD_HAS_QCOM_WLAN              := true
