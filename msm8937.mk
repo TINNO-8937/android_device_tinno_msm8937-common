@@ -209,7 +209,7 @@ PRODUCT_PACKAGES += \
 
 # IMS
 PRODUCT_PACKAGES += \
-    ims-ext-common
+    ims-ext-common_system
 
 # Init scripts
 PRODUCT_PACKAGES += \
