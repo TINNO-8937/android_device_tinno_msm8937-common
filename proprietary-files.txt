@@ -670,7 +670,6 @@ vendor/lib64/libqmiservices.so
 -app/QtiTelephonyService/QtiTelephonyService.apk
 etc/permissions/qcrilhook.xml
 framework/qcrilhook.jar
-framework/qti-telephony-common.jar
 -priv-app/qcrilmsgtunnel/qcrilmsgtunnel.apk
 vendor/bin/ATFWD-daemon
 vendor/bin/netmgrd
@@ -708,6 +707,9 @@ vendor/lib64/vendor.qti.hardware.radio.uim@1.1.so
 vendor/lib64/vendor.qti.hardware.radio.uim_remote_client@1.0.so
 vendor/lib64/vendor.qti.hardware.radio.uim_remote_server@1.0.so
 vendor/radio/qcril_database/qcril.db
+
+# Radio - from LA.UM.8.6.r1-01900-89xx.0
+product/framework/qti-telephony-common.jar
 
 # Sensors - from TA-1024 - PKQ1.181105.001
 -framework/vendor.qti.hardware.sensorscalibrate-V1.0-java.jar
