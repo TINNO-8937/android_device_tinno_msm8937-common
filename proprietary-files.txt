@@ -670,7 +670,7 @@ vendor/lib64/libqmiservices.so
 -app/QtiTelephonyService/QtiTelephonyService.apk
 etc/permissions/qcrilhook.xml
 framework/qcrilhook.jar
--priv-app/qcrilmsgtunnel/qcrilmsgtunnel.apk
+-priv-app/qcrilmsgtunnel/qcrilmsgtunnel.apk|99d164a9766f395793878f2389bb434e
 vendor/bin/ATFWD-daemon
 vendor/bin/netmgrd
 vendor/bin/qti
