@@ -1,9 +1,0 @@
-typeattribute system_app binder_in_vendor_violators;
-allow system_app gx_fpd:binder call;
-
-allow system_app perfprofd:binder call;
-allow system_app proc_pagetypeinfo:file { read open getattr };
-allow system_app sysfs_zram:dir search;
-allow system_app sysfs_zram:file { read open getattr };
-allow system_app init:binder { call transfer };
-allow system_app wificond:binder { call transfer };

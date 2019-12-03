@@ -1,2 +1,0 @@
-allow crash_dump radio_data_file:file { read open getattr };
-allow crash_dump resourcecache_data_file:file { read open getattr };

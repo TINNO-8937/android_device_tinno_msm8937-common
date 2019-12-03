@@ -1,5 +1,0 @@
-allow dumpstate sysfs:file { read open };
-allow dumpstate mnt_vendor_file:dir search;
-allow dumpstate adsprpcd_file:filesystem getattr;
-allow dumpstate hal_fingerprint_default:binder { call transfer };
-allow dumpstate gx_fpd:binder { call transfer };
