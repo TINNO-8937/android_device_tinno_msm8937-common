@@ -214,7 +214,8 @@ PRODUCT_PACKAGES += \
     init.qcom.usb.rc \
     init.msm.usb.configfs.rc \
     init.qcom.usb.sh \
-    ueventd.qcom.rc
+    ueventd.qcom.rc \
+    fstab.qcom
 
 # IRSC
 PRODUCT_COPY_FILES += \
