@@ -65,6 +65,22 @@ $(IMS_SYMLINKS): $(LOCAL_INSTALLED_MODULE)
 
 ALL_DEFAULT_INSTALLED_MODULES += $(IMS_SYMLINKS)
 
+# A/B builds require us to create the mount points at compile time.
+# Just creating it for all cases since it does not hurt.
+FIRMWARE_MOUNT_POINT := $(TARGET_OUT_VENDOR)/firmware_mnt
+BT_FIRMWARE_MOUNT_POINT := $(TARGET_OUT_VENDOR)/bt_firmware
+DSP_MOUNT_POINT := $(TARGET_OUT_VENDOR)/dsp
+
+$(FIRMWARE_MOUNT_POINT):
+	@echo "Creating $(FIRMWARE_MOUNT_POINT)"
+	@mkdir -p $(TARGET_OUT_VENDOR)/firmware_mnt
+
+$(DSP_MOUNT_POINT):
+	@echo "Creating $(DSP_MOUNT_POINT)"
+	@mkdir -p $(TARGET_OUT_VENDOR)/dsp
+
+ALL_DEFAULT_INSTALLED_MODULES += $(FIRMWARE_MOUNT_POINT) $(DSP_MOUNT_POINT)
+
 RFS_MSM_ADSP_SYMLINKS := $(TARGET_OUT_VENDOR)/rfs/msm/adsp/
 $(RFS_MSM_ADSP_SYMLINKS): $(LOCAL_INSTALLED_MODULE)
 	@echo "Creating RFS MSM ADSP folder structure: $@"
