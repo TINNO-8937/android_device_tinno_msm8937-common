@@ -160,7 +160,8 @@ PRODUCT_COPY_FILES += \
 # Fingerprint
 PRODUCT_PACKAGES += \
     android.hardware.biometrics.fingerprint@2.0-service-custom \
-    fingerprint.msm8937
+    fingerprint.msm8937 \
+    libunwind
 
 # FM
 PRODUCT_PACKAGES += \
