@@ -22,6 +22,7 @@
 #include <hardware/fingerprint.h>
 #include "BiometricsFingerprint.h"
 
+#include <cutils/properties.h>
 #include <inttypes.h>
 #include <unistd.h>
 
@@ -33,7 +34,7 @@ namespace V2_1 {
 namespace implementation {
 
 // Supported fingerprint HAL version
-static const uint16_t kVersion = HARDWARE_MODULE_API_VERSION(2, 1);
+static bool is_goodix = false;
 
 using RequestStatus =
         android::hardware::biometrics::fingerprint::V2_1::RequestStatus;
@@ -174,7 +175,16 @@ Return<uint64_t> BiometricsFingerprint::getAuthenticatorId() {
 }
 
 Return<RequestStatus> BiometricsFingerprint::cancel() {
-    return ErrorFilter(mDevice->cancel(mDevice));
+    /* notify client on cancel hack */
+    int ret = mDevice->cancel(mDevice);
+    ALOG(LOG_VERBOSE, LOG_TAG, "cancel() %d\n", ret);
+    if (ret == 0) {
+        fingerprint_msg_t msg;
+        msg.type = FINGERPRINT_ERROR;
+        msg.data.error = FINGERPRINT_ERROR_CANCELED;
+        sInstance->notify(&msg);
+    }
+    return ErrorFilter(ret);
 }
 
 Return<RequestStatus> BiometricsFingerprint::enumerate()  {
@@ -194,9 +204,11 @@ Return<RequestStatus> BiometricsFingerprint::setActiveGroup(uint32_t gid,
     if (access(storePath.c_str(), W_OK)) {
         return RequestStatus::SYS_EINVAL;
     }
-
-    return ErrorFilter(mDevice->set_active_group(mDevice, gid,
-                                                    storePath.c_str()));
+    int ret = mDevice->set_active_group(mDevice, gid, storePath.c_str());
+    /* set active group hack for goodix */
+    if ((ret > 0) && is_goodix)
+        ret = 0;
+    return ErrorFilter(ret);
 }
 
 Return<RequestStatus> BiometricsFingerprint::authenticate(uint64_t operationId,
@@ -211,42 +223,80 @@ IBiometricsFingerprint* BiometricsFingerprint::getInstance() {
     return sInstance;
 }
 
-fingerprint_device_t* BiometricsFingerprint::openHal() {
+fingerprint_device_t* getDeviceForVendor(const char *class_name)
+{
+    const hw_module_t *hw_module = nullptr;
     int err;
-    const hw_module_t *hw_mdl = nullptr;
-    ALOGD("Opening fingerprint hal library...");
-    if (0 != (err = hw_get_module(FINGERPRINT_HARDWARE_MODULE_ID, &hw_mdl))) {
-        ALOGE("Can't open fingerprint HW Module, error: %d", err);
+
+    err = hw_get_module_by_class(FINGERPRINT_HARDWARE_MODULE_ID, class_name, &hw_module);
+    if (err) {
+        ALOGE("Failed to get fingerprint module: class %s, error %d", class_name, err);
         return nullptr;
     }
 
-    if (hw_mdl == nullptr) {
-        ALOGE("No valid fingerprint module");
+    if (hw_module == nullptr) {
+        ALOGE("No valid fingerprint module: class %s", class_name);
         return nullptr;
     }
 
-    fingerprint_module_t const *module =
-        reinterpret_cast<const fingerprint_module_t*>(hw_mdl);
-    if (module->common.methods->open == nullptr) {
-        ALOGE("No valid open method");
+    fingerprint_module_t const *fp_module =
+            reinterpret_cast<const fingerprint_module_t*>(hw_module);
+
+    if (fp_module->common.methods->open == nullptr) {
+        ALOGE("No valid open method: class %s", class_name);
         return nullptr;
     }
 
     hw_device_t *device = nullptr;
 
-    if (0 != (err = module->common.methods->open(hw_mdl, nullptr, &device))) {
-        ALOGE("Can't open fingerprint methods, error: %d", err);
+    err = fp_module->common.methods->open(hw_module, nullptr, &device);
+    if (err) {
+        ALOGE("Can't open fingerprint methods, class %s, error: %d", class_name, err);
         return nullptr;
     }
 
-    if (kVersion != device->version) {
-        // enforce version on new devices because of HIDL@2.1 translation layer
-        ALOGE("Wrong fp version. Expected %d, got %d", kVersion, device->version);
-        return nullptr;
+    fingerprint_device_t *fp_device =
+            reinterpret_cast<fingerprint_device_t*>(device);
+
+    ALOGI("Loaded fingerprint module: class %s", class_name);
+    return fp_device;
+}
+
+fingerprint_device_t* getFingerprintDevice()
+{
+    fingerprint_device_t *fp_device;
+
+    fp_device = getDeviceForVendor("elan");
+    if (fp_device == nullptr) {
+        ALOGE("Failed to load elan fingerprint module");
+    } else {
+	ALOGE("Can't open GOODIX HAL module");
+	property_set("persist.sys.fp.goodix", "0");
+	is_goodix = false;
+        return fp_device;
     }
 
-    fingerprint_device_t* fp_device =
-        reinterpret_cast<fingerprint_device_t*>(device);
+    fp_device = getDeviceForVendor("goodix");
+    if (fp_device == nullptr) {
+        ALOGE("Failed to load goodix fingerprint module");
+    } else {
+	ALOGE("Can't open ELAN HAL module");
+	property_set("persist.sys.fp.goodix", "1");
+	is_goodix = true;
+        return fp_device;
+    }
+
+    return nullptr;
+}
+
+fingerprint_device_t* BiometricsFingerprint::openHal() {
+    int err;
+
+    fingerprint_device_t *fp_device;
+    fp_device = getFingerprintDevice();
+    if (fp_device == nullptr) {
+        return nullptr;
+    }
 
     if (0 != (err =
             fp_device->set_notify(fp_device, BiometricsFingerprint::notify))) {
