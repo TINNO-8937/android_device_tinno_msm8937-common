@@ -245,48 +245,45 @@ IBiometricsFingerprint* BiometricsFingerprint::getInstance() {
     return sInstance;
 }
 
-fingerprint_device_t* getDeviceForVendor(const char *class_name)
+fingerprint_device_t* getDeviceForVendor(const char *module_id)
 {
-    const hw_module_t *hw_module = nullptr;
     int err;
-
-    err = hw_get_module_by_class(FINGERPRINT_HARDWARE_MODULE_ID, class_name, &hw_module);
-    if (err) {
-        ALOGE("Failed to get fingerprint module: class %s, error %d", class_name, err);
+    const hw_module_t *hw_mdl = nullptr;
+    ALOGD("Opening fingerprint hal library...");
+    if (0 != (err = hw_get_module(module_id, &hw_mdl))) {
+        ALOGE("Can't open fingerprint HW Module: module_id: %s, error: %d", module_id, err);
         return nullptr;
     }
 
-    if (hw_module == nullptr) {
-        ALOGE("No valid fingerprint module: class %s", class_name);
+    if (hw_mdl == nullptr) {
+        ALOGE("No valid fingerprint module: module_id: %s", module_id);
         return nullptr;
     }
 
-    fingerprint_module_t const *fp_module =
-            reinterpret_cast<const fingerprint_module_t*>(hw_module);
-
-    if (fp_module->common.methods->open == nullptr) {
-        ALOGE("No valid open method: class %s", class_name);
+    fingerprint_module_t const *module =
+        reinterpret_cast<const fingerprint_module_t*>(hw_mdl);
+    if (module->common.methods->open == nullptr) {
+        ALOGE("No valid open method: module_id: %s", module_id);
         return nullptr;
     }
 
     hw_device_t *device = nullptr;
 
-    err = fp_module->common.methods->open(hw_module, nullptr, &device);
-    if (err) {
-        ALOGE("Can't open fingerprint methods, class %s, error: %d", class_name, err);
+    if (0 != (err = module->common.methods->open(hw_mdl, nullptr, &device))) {
+        ALOGE("Can't open fingerprint methods, module_id: %s error: %d", module_id, err);
         return nullptr;
     }
 
-    if (kVersion != device->version && !is_goodix) {
+    if (kVersion != device->version) {
         // enforce version on new devices because of HIDL@2.1 translation layer
         ALOGE("Wrong fp version. Expected %d, got %d", kVersion, device->version);
-        //return nullptr;
+        return nullptr;
     }
 
-    fingerprint_device_t *fp_device =
-            reinterpret_cast<fingerprint_device_t*>(device);
+    fingerprint_device_t* fp_device =
+        reinterpret_cast<fingerprint_device_t*>(device);
 
-    ALOGI("Loaded fingerprint module: class %s", class_name);
+    ALOGI("Loaded fingerprint module: module_id %s", module_id);
     return fp_device;
 }
 
@@ -294,7 +291,7 @@ fingerprint_device_t* getFingerprintDevice()
 {
     fingerprint_device_t *fp_device;
 
-    fp_device = getDeviceForVendor("elan");
+    fp_device = getDeviceForVendor("fingerprint.elan");
     if (fp_device == nullptr) {
         ALOGE("Failed to load elan fingerprint module");
     } else {
@@ -304,7 +301,7 @@ fingerprint_device_t* getFingerprintDevice()
         return fp_device;
     }
 
-    fp_device = getDeviceForVendor("goodix");
+    fp_device = getDeviceForVendor("fingerprint.goodix");
     if (fp_device == nullptr) {
         ALOGE("Failed to load goodix fingerprint module");
     } else {
