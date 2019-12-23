@@ -6,3 +6,47 @@ service vendor.fps_hal /vendor/bin/hw/android.hardware.biometrics.fingerprint@2.
     user system
     group system input uhid
     writepid /dev/cpuset/system-background/tasks
+    disabled
+
+service vendor.gx_fpd /vendor/bin/gx_fpd
+    class core
+    user system
+    group system
+    writepid /dev/cpuset/system-background/tasks
+
+on post-fs-data
+    # Create directories for Silead
+    chmod 0666 /dev/silead_fp_dev
+    mkdir /data/silead 0777 shell shell
+    chown system system /sys/silead/fp_wake_lock
+    chown system system /sys/silead/fp_wake_unlock
+
+    # Create directories for Goodix
+    mkdir /data/system/fingerprint 0770 root system
+    restorecon_recursive /data/system/fingerprint  
+    mkdir /data/system/fingerprint/match 0770 root system
+    restorecon_recursive /data/system/fingerprint/match  
+    mkdir /data/system/fingerprint/unmatch 0770 root system
+    restorecon_recursive /data/system/fingerprint/unmatch  
+    mkdir /data/system/fingerprint/calibration 0770 root system
+    restorecon_recursive /data/system/fingerprint/calibration  
+    mkdir /data/system/fingerprint/register 0770 root system
+    restorecon_recursive /data/system/fingerprint/register  
+    mkdir /data/system/users/0/ 0775 system system
+    mkdir /data/system/users/0/fpdata 0775 system system
+    restorecon /data/system/users/0/fpdata
+
+on boot
+    # Fingerprint Permissions
+    chown system system /dev/goodix_fp
+    chmod 0644 /dev/goodix_fp
+
+    start vendor.gx_fpd
+
+on property:persist.sys.fp.goodix=0
+    stop vendor.gx_fpd
+    start vendor.fps_hal
+
+on property:persist.sys.fp.goodix=1
+    start vendor.fps_hal
+

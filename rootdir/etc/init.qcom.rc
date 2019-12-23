@@ -445,26 +445,7 @@ on post-fs-data
     chmod 606 /dev/ltr553_ps
     chmod 777 /system/vendor/bin/mm-audio-ftm
 
-    # Silead
-    chmod 0666 /dev/silead_fp_dev
-    mkdir /data/silead 0777 shell shell
-    chown system system /sys/silead/fp_wake_lock
-    chown system system /sys/silead/fp_wake_unlock
 
-    # Goodix
-    mkdir /data/system/fingerprint 0770 root system
-    restorecon_recursive /data/system/fingerprint  
-    mkdir /data/system/fingerprint/match 0770 root system
-    restorecon_recursive /data/system/fingerprint/match  
-    mkdir /data/system/fingerprint/unmatch 0770 root system
-    restorecon_recursive /data/system/fingerprint/unmatch  
-    mkdir /data/system/fingerprint/calibration 0770 root system
-    restorecon_recursive /data/system/fingerprint/calibration  
-    mkdir /data/system/fingerprint/register 0770 root system
-    restorecon_recursive /data/system/fingerprint/register  
-    mkdir /data/system/users/0/ 0775 system system
-    mkdir /data/system/users/0/fpdata 0775 system system
-    restorecon /data/system/users/0/fpdata
 
 on property:sys.boot_completed=1
     write /dev/kmsg "Boot completed "
@@ -699,15 +680,3 @@ service time_daemon /vendor/bin/time_daemon
     user root
     group root
     writepid /dev/cpuset/system-background/tasks
-
-service gx_fpd /vendor/bin/gx_fpd
-    class main
-    user root
-    group root system
-    oneshot
-
-on property:persist.sys.fp.goodix=0
-    stop gx_fpd
-
-on property:persist.sys.fp.goodix=1
-    start gx_fpd
