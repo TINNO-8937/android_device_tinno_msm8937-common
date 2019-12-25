@@ -6,13 +6,13 @@ service vendor.fps_hal /vendor/bin/hw/android.hardware.biometrics.fingerprint@2.
     user system
     group system input uhid
     writepid /dev/cpuset/system-background/tasks
-    disabled
 
 service vendor.gx_fpd /vendor/bin/gx_fpd
     class core
     user system
     group system
     writepid /dev/cpuset/system-background/tasks
+    oneshot
 
 on post-fs-data
     # Create directories for Silead
@@ -41,12 +41,6 @@ on boot
     chown system system /dev/goodix_fp
     chmod 0644 /dev/goodix_fp
 
-    start vendor.gx_fpd
-
 on property:persist.sys.fp.goodix=0
     stop vendor.gx_fpd
-    start vendor.fps_hal
-
-on property:persist.sys.fp.goodix=1
-    start vendor.fps_hal
 
