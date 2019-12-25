@@ -292,23 +292,23 @@ fingerprint_device_t* getFingerprintDevice()
 {
     fingerprint_device_t *fp_device;
 
+    fp_device = getDeviceForVendor("fingerprint.goodix");
+    if (fp_device == nullptr) {
+        ALOGE("Failed to load goodix fingerprint module");
+	property_set("persist.sys.fp.goodix", "0");
+	is_goodix = false;
+    } else {
+	ALOGE("Can't open ELAN HAL module");
+	property_set("persist.sys.fp.goodix", "1");
+	is_goodix = true;
+        return fp_device;
+    }
+
     fp_device = getDeviceForVendor("fingerprint.elan");
     if (fp_device == nullptr) {
         ALOGE("Failed to load elan fingerprint module");
     } else {
 	ALOGE("Can't open GOODIX HAL module");
-	property_set("persist.sys.fp.goodix", "0");
-	is_goodix = false;
-        return fp_device;
-    }
-
-    fp_device = getDeviceForVendor("fingerprint.goodix");
-    if (fp_device == nullptr) {
-        ALOGE("Failed to load goodix fingerprint module");
-    } else {
-	ALOGE("Can't open ELAN HAL module");
-	property_set("persist.sys.fp.goodix", "1");
-	is_goodix = true;
         return fp_device;
     }
 
