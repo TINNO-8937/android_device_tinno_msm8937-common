@@ -58,18 +58,26 @@ void init_fingerprint_properties()
         LOG(INFO) << "Loading Fingerprint HAL for sensor version " << fp_dev;
         if (!strncmp(fp_dev.c_str(), "silead_fp", 9)) {
             property_set("ro.hardware.fingerprint", "silead");
+            property_set("persist.sys.fp.goodix", "0");
         } else if (!strncmp(fp_dev.c_str(), "goodix_fp", 9)) {
             property_set("ro.hardware.fingerprint", "goodix");
+            property_set("persist.sys.fp.goodix", "1");
         } else if (!strncmp(fp_dev.c_str(), "elan_fp", 7)) {
             property_set("ro.hardware.fingerprint", "elan");
+            property_set("persist.sys.fp.goodix", "0");
         } else if (!strncmp(fp_dev.c_str(), "chipone_fp", 10)) {
             property_set("ro.hardware.fingerprint", "chipone");
+            property_set("persist.sys.fp.goodix", "0");
         } else {
             LOG(ERROR) << "Unsupported fingerprint sensor: " << fp_dev;
+            property_set("ro.hardware.fingerprint", "none");
+            property_set("persist.sys.fp.goodix", "0");
         }
     }
     else {
         LOG(ERROR) << "Failed to detect sensor version";
+        property_set("ro.hardware.fingerprint", "none");
+        property_set("persist.sys.fp.goodix", "0");
     }
 }
 

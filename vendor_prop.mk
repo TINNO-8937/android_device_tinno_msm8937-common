@@ -102,8 +102,7 @@ ro.frp.pst=/dev/block/bootdevice/by-name/config
 
 # Fingerprint
 PRODUCT_PROPERTY_OVERRIDES += \
-persist.qfp=false \
-persist.sys.fp.goodix=1
+persist.qfp=false
 
 # Media
 PRODUCT_PROPERTY_OVERRIDES += \

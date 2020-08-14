@@ -22,6 +22,9 @@
 #include <android/hardware/biometrics/fingerprint/2.1/IBiometricsFingerprint.h>
 #include <android/hardware/biometrics/fingerprint/2.1/types.h>
 #include "BiometricsFingerprint.h"
+#include <cutils/properties.h>
+#include <errno.h>
+#include <unistd.h>
 
 using android::hardware::biometrics::fingerprint::V2_1::IBiometricsFingerprint;
 using android::hardware::biometrics::fingerprint::V2_1::implementation::BiometricsFingerprint;
@@ -29,7 +32,23 @@ using android::hardware::configureRpcThreadpool;
 using android::hardware::joinRpcThreadpool;
 using android::sp;
 
+bool is_goodix = false;
+
 int main() {
+    char vend[PROPERTY_VALUE_MAX];
+    property_get("ro.hardware.fingerprint", vend, "none");
+
+    if (!strcmp(vend, "none")) {
+        ALOGE("ro.hardware.fingerprint not set! Killing " LOG_TAG " binder service!");
+        return 1;
+    } else if (!strcmp(vend, "goodix")) {
+        ALOGI("is_goodix = true");
+        is_goodix = true;
+    } else {
+        ALOGI("is_goodix = false");
+    }
+
+    ALOGI("Start biometrics");
     android::sp<IBiometricsFingerprint> bio = BiometricsFingerprint::getInstance();
 
     configureRpcThreadpool(1, true /*callerWillJoin*/);
