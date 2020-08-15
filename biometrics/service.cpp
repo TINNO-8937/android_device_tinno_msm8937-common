@@ -51,7 +51,13 @@ int main() {
     ALOGI("Start biometrics");
     android::sp<IBiometricsFingerprint> bio = BiometricsFingerprint::getInstance();
 
-    configureRpcThreadpool(1, true /*callerWillJoin*/);
+    /* process Binder transaction as a single-threaded program. */
+    if (is_goodix) {
+        configureRpcThreadpool(1, false /* callerWillJoin */);
+    } else {
+        /* process Binder transaction as a single-threaded program. */
+        configureRpcThreadpool(1, true /* callerWillJoin */);
+    }
 
     if (bio != nullptr) {
         if (::android::OK != bio->registerAsService()) {
@@ -61,7 +67,12 @@ int main() {
         ALOGE("Can't create instance of BiometricsFingerprint, nullptr");
     }
 
-    joinRpcThreadpool();
+    if (is_goodix) {
+        /* ensure that gx_fpd will be able to send IPC calls to this process */
+        android::IPCThreadState::self()->joinThreadPool();
+    } else {
+        joinRpcThreadpool();
+    }
 
     return 0; // should never get here
 }
